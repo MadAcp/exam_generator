@@ -7,6 +7,7 @@ const paperQuestionSchema = new mongoose.Schema(
     topic: { type: String, required: true, trim: true },
     difficulty: { type: String, enum: ['Easy', 'Medium', 'Hard'], required: true },
     marks: { type: Number, required: true, min: 1 },
+    options: { type: [String], default: [] },
     answer: { type: String, default: '', trim: true },
   },
   { _id: false },

@@ -68,6 +68,29 @@
   gap: 1rem;
 }
 
+.readonly-note {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.stat-card {
+  border: 1px solid #dbe3f0;
+  border-radius: 16px;
+  padding: 1rem;
+  background: #f8fafc;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.stat-card strong {
+  font-size: 1.4rem;
+}
+
+.stat-card span {
+  color: #475569;
+}
+
 .compact {
   margin-bottom: 1rem;
 }
@@ -158,6 +181,11 @@ button.danger {
   background: #f8fafc;
 }
 
+.question-card p,
+.builder-item p {
+  margin: 0.75rem 0;
+}
+
 .question-topline,
 .paper-meta,
 .paper-question-line {
@@ -185,6 +213,22 @@ button.danger {
 .pill.subtle {
   background: #e2e8f0;
   color: #475569;
+}
+
+.option-list,
+.paper-options {
+  margin: 0 0 1rem;
+  padding-left: 1.4rem;
+  color: #334155;
+}
+
+.option-list li,
+.paper-options li {
+  margin-bottom: 0.35rem;
+}
+
+.compact-list {
+  margin-bottom: 0.6rem;
 }
 
 .saved-card {
@@ -217,6 +261,11 @@ button.danger {
   display: grid;
   gap: 1rem;
   padding-left: 1.3rem;
+}
+
+.paper-options {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
 }
 
 .answer-key {

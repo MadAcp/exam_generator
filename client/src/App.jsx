@@ -2,28 +2,22 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import api from './api'
 import './App.css'
 
-const emptyQuestion = {
-  text: '',
-  subject: 'Mathematics',
-  topic: '',
-  difficulty: 'Medium',
-  marks: 5,
-  answer: '',
-  tags: '',
+const defaultPaperMeta = {
+  title: 'HTML & CSS MCQ Paper',
+  subject: 'HTML & CSS',
+  duration: '60 minutes',
+  instructions: 'Choose the most appropriate option for each question.',
+}
+
+function getOptionLabel(index) {
+  return String.fromCharCode(65 + index)
 }
 
 function App() {
   const [questions, setQuestions] = useState([])
   const [papers, setPapers] = useState([])
-  const [questionForm, setQuestionForm] = useState(emptyQuestion)
-  const [editingQuestionId, setEditingQuestionId] = useState('')
   const [filters, setFilters] = useState({ subject: '', topic: '', difficulty: '', search: '' })
-  const [paperMeta, setPaperMeta] = useState({
-    title: 'Midterm Examination',
-    subject: 'Mathematics',
-    duration: '90 minutes',
-    instructions: 'Answer all questions. Show all necessary working.',
-  })
+  const [paperMeta, setPaperMeta] = useState(() => ({ ...defaultPaperMeta }))
   const [selectedQuestions, setSelectedQuestions] = useState([])
   const [activePaperId, setActivePaperId] = useState('')
   const [status, setStatus] = useState({ type: 'idle', message: '' })
@@ -34,7 +28,10 @@ function App() {
     [selectedQuestions],
   )
 
-
+  const availableTopics = useMemo(
+    () => [...new Set(questions.map((question) => question.topic))].sort((a, b) => a.localeCompare(b)),
+    [questions],
+  )
 
   const loadQuestions = useCallback(async () => {
     try {
@@ -62,11 +59,6 @@ function App() {
     void loadPapers()
   }, [loadPapers])
 
-  function handleQuestionChange(event) {
-    const { name, value } = event.target
-    setQuestionForm((current) => ({ ...current, [name]: value }))
-  }
-
   function handleFilterChange(event) {
     const { name, value } = event.target
     setFilters((current) => ({ ...current, [name]: value }))
@@ -75,59 +67,6 @@ function App() {
   function handlePaperMetaChange(event) {
     const { name, value } = event.target
     setPaperMeta((current) => ({ ...current, [name]: value }))
-  }
-
-  async function handleQuestionSubmit(event) {
-    event.preventDefault()
-
-    const payload = {
-      ...questionForm,
-      marks: Number(questionForm.marks),
-      tags: questionForm.tags
-        .split(',')
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-    }
-
-    try {
-      if (editingQuestionId) {
-        await api.put(`/questions/${editingQuestionId}`, payload)
-        setStatus({ type: 'success', message: 'Question updated.' })
-      } else {
-        await api.post('/questions', payload)
-        setStatus({ type: 'success', message: 'Question created.' })
-      }
-
-      setQuestionForm(emptyQuestion)
-      setEditingQuestionId('')
-      await loadQuestions()
-    } catch (error) {
-      setStatus({ type: 'error', message: error.response?.data?.message || 'Unable to save question.' })
-    }
-  }
-
-  function startEditingQuestion(question) {
-    setEditingQuestionId(question.id)
-    setQuestionForm({
-      text: question.text,
-      subject: question.subject,
-      topic: question.topic,
-      difficulty: question.difficulty,
-      marks: question.marks,
-      answer: question.answer,
-      tags: question.tags.join(', '),
-    })
-  }
-
-  async function deleteQuestion(questionId) {
-    try {
-      await api.delete(`/questions/${questionId}`)
-      setSelectedQuestions((current) => current.filter((question) => question.questionId !== questionId))
-      setStatus({ type: 'success', message: 'Question deleted.' })
-      await loadQuestions()
-    } catch {
-      setStatus({ type: 'error', message: 'Unable to delete question.' })
-    }
   }
 
   function addQuestionToPaper(question) {
@@ -144,6 +83,7 @@ function App() {
           topic: question.topic,
           difficulty: question.difficulty,
           marks: question.marks,
+          options: Array.isArray(question.options) ? question.options : [],
           answer: question.answer,
         },
       ]
@@ -194,19 +134,19 @@ function App() {
       duration: paper.duration,
       instructions: paper.instructions,
     })
-    setSelectedQuestions(paper.questions)
+    setSelectedQuestions(
+      paper.questions.map((question) => ({
+        ...question,
+        options: Array.isArray(question.options) ? question.options : [],
+      })),
+    )
     setStatus({ type: 'success', message: `Loaded paper: ${paper.title}` })
   }
 
   function createNewPaper() {
     setActivePaperId('')
     setSelectedQuestions([])
-    setPaperMeta({
-      title: 'Midterm Examination',
-      subject: 'Mathematics',
-      duration: '90 minutes',
-      instructions: 'Answer all questions. Show all necessary working.',
-    })
+    setPaperMeta({ ...defaultPaperMeta })
   }
 
   async function downloadPdf() {
@@ -234,9 +174,9 @@ function App() {
       <header className="hero">
         <div>
           <p className="eyebrow">MERN exam generator</p>
-          <h1>Create printable exam papers from your question bank</h1>
+          <h1>Create printable exam papers from your HTML &amp; CSS MCQ bank</h1>
           <p className="hero-copy">
-            Add questions, curate a paper, print it, or export a polished PDF.
+            Browse the read-only MCQ bank, curate a paper, print it, or export a polished PDF.
           </p>
         </div>
         <div className="hero-actions">
@@ -255,53 +195,32 @@ function App() {
       <main className="workspace-grid">
         <section className="panel">
           <div className="panel-header">
-            <h2>{editingQuestionId ? 'Edit question' : 'Add question'}</h2>
-            {editingQuestionId ? (
-              <button className="secondary" onClick={() => { setEditingQuestionId(''); setQuestionForm(emptyQuestion) }}>
-                Cancel edit
-              </button>
-            ) : null}
+            <h2>Question source</h2>
+            <span>Read only</span>
           </div>
 
-          <form className="stack" onSubmit={handleQuestionSubmit}>
-            <label>
-              Question text
-              <textarea name="text" rows="4" value={questionForm.text} onChange={handleQuestionChange} required />
-            </label>
+          <div className="stack">
+            <p className="readonly-note">
+              The app now uses only the HTML/CSS MCQs loaded from <code>server/src/data/mcqs.js</code>.
+            </p>
             <div className="grid-2">
-              <label>
-                Subject
-                <input name="subject" value={questionForm.subject} onChange={handleQuestionChange} required />
-              </label>
-              <label>
-                Topic
-                <input name="topic" value={questionForm.topic} onChange={handleQuestionChange} required />
-              </label>
+              <div className="stat-card">
+                <strong>{questions.length}</strong>
+                <span>available MCQs</span>
+              </div>
+              <div className="stat-card">
+                <strong>{availableTopics.length}</strong>
+                <span>topics covered</span>
+              </div>
             </div>
-            <div className="grid-2">
-              <label>
-                Difficulty
-                <select name="difficulty" value={questionForm.difficulty} onChange={handleQuestionChange}>
-                  <option>Easy</option>
-                  <option>Medium</option>
-                  <option>Hard</option>
-                </select>
-              </label>
-              <label>
-                Marks
-                <input name="marks" type="number" min="1" value={questionForm.marks} onChange={handleQuestionChange} required />
-              </label>
+            <div className="pill-row">
+              {availableTopics.map((topic) => (
+                <span className="pill subtle" key={topic}>
+                  {topic}
+                </span>
+              ))}
             </div>
-            <label>
-              Answer key / marking note
-              <textarea name="answer" rows="3" value={questionForm.answer} onChange={handleQuestionChange} />
-            </label>
-            <label>
-              Tags (comma separated)
-              <input name="tags" value={questionForm.tags} onChange={handleQuestionChange} placeholder="algebra, grade-10" />
-            </label>
-            <button type="submit">{editingQuestionId ? 'Update question' : 'Save question'}</button>
-          </form>
+          </div>
         </section>
 
         <section className="panel">
@@ -312,7 +231,6 @@ function App() {
 
           <div className="filter-grid">
             <input name="search" value={filters.search} onChange={handleFilterChange} placeholder="Search questions" />
-            <input name="subject" value={filters.subject} onChange={handleFilterChange} placeholder="Filter by subject" />
             <input name="topic" value={filters.topic} onChange={handleFilterChange} placeholder="Filter by topic" />
             <select name="difficulty" value={filters.difficulty} onChange={handleFilterChange}>
               <option value="">All difficulty</option>
@@ -330,6 +248,13 @@ function App() {
                   <span>{question.topic}</span>
                 </div>
                 <p>{question.text}</p>
+                {question.options?.length ? (
+                  <ol className="option-list" type="A">
+                    {question.options.map((option, index) => (
+                      <li key={`${question.id}-${getOptionLabel(index)}`}>{option}</li>
+                    ))}
+                  </ol>
+                ) : null}
                 <div className="pill-row">
                   <span className="pill">{question.difficulty}</span>
                   <span className="pill">{question.marks} marks</span>
@@ -341,12 +266,6 @@ function App() {
                 </div>
                 <div className="card-actions">
                   <button onClick={() => addQuestionToPaper(question)}>Add to paper</button>
-                  <button className="secondary" onClick={() => startEditingQuestion(question)}>
-                    Edit
-                  </button>
-                  <button className="danger" onClick={() => void deleteQuestion(question.id)}>
-                    Delete
-                  </button>
                 </div>
               </article>
             ))}
@@ -393,6 +312,13 @@ function App() {
                 <div>
                   <strong>Q{index + 1}</strong>
                   <p>{question.text}</p>
+                  {question.options?.length ? (
+                    <ol className="option-list compact-list" type="A">
+                      {question.options.map((option, optionIndex) => (
+                        <li key={`${question.questionId}-${getOptionLabel(optionIndex)}`}>{option}</li>
+                      ))}
+                    </ol>
+                  ) : null}
                   <small>
                     {question.topic} · {question.difficulty} · {question.marks} marks
                   </small>
@@ -458,6 +384,13 @@ function App() {
                   <span>{question.text}</span>
                   <strong>({question.marks} marks)</strong>
                 </div>
+                {question.options?.length ? (
+                  <ol className="paper-options" type="A">
+                    {question.options.map((option, index) => (
+                      <li key={`${question.questionId}-option-${getOptionLabel(index)}`}>{option}</li>
+                    ))}
+                  </ol>
+                ) : null}
               </li>
             ))}
           </ol>
