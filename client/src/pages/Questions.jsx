@@ -293,10 +293,10 @@ export default function Questions() {
                 // This makes it feel more like "Rows" and less like a static grid
                 className="p-datatable-sm" 
               >
-                <Column field="subject" header="Subject" sortable style={{ width: '15%' }}></Column>
-                <Column header="Question" body={questionTemplate} style={{ width: '50%' }}></Column>
-                <Column field="difficulty" header="Difficulty" body={difficultyTemplate} sortable style={{ width: '10%' }}></Column>
-                <Column field="marks" header="Marks" sortable style={{ width: '10%' }}></Column>
+                <Column field="subject"></Column>
+                <Column body={questionTemplate} style={{ width: '50%' }}></Column>
+                <Column field="difficulty" body={difficultyTemplate}></Column>
+                <Column field="marks"></Column>
                 <Column 
                     header="Action" 
                     body={(rowData) => (
