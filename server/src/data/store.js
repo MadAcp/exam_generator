@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Question = require('../models/Question');
 const ExamPaper = require('../models/ExamPaper');
 const { seedQuestions } = require('./sampleData');
+const { mcqBank} = require('./mcqBank');
 
 let storageMode = 'memory';
 const memoryStore = {
