@@ -1,40 +1,23 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import './App.css'
-import Layout from './components/Layout'
-import HomePage from './pages/HomePage'
-import QuestionManagementPage from './pages/QuestionManagementPage'
-import PaperBuilderPage from './pages/PaperBuilderPage'
-import PapersListPage from './pages/PapersListPage'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import api from '../api'
 
-const defaultPaperMeta = {
-  title: 'HTML & CSS MCQ Paper',
-  subject: 'HTML & CSS',
-  duration: '60 minutes',
-  instructions: 'Choose the most appropriate option for each question.',
-}
-
-function getOptionLabel(index) {
-  return String.fromCharCode(65 + index)
-}
-
-function App() {
+export default function PaperBuilderPage() {
   const [questions, setQuestions] = useState([])
-  const [papers, setPapers] = useState([])
-  const [filters, setFilters] = useState({ subject: '', topic: '', difficulty: '', search: '' })
-  const [paperMeta, setPaperMeta] = useState(() => ({ ...defaultPaperMeta }))
   const [selectedQuestions, setSelectedQuestions] = useState([])
+  const [paperMeta, setPaperMeta] = useState({
+    title: 'Midterm Examination',
+    subject: 'Mathematics',
+    duration: '90 minutes',
+    instructions: 'Answer all questions. Show all necessary working.',
+  })
   const [activePaperId, setActivePaperId] = useState('')
   const [status, setStatus] = useState({ type: 'idle', message: '' })
+  const [filters, setFilters] = useState({ subject: '', topic: '', difficulty: '', search: '' })
   const paperRef = useRef(null)
 
   const totalMarks = useMemo(
     () => selectedQuestions.reduce((sum, question) => sum + Number(question.marks || 0), 0),
     [selectedQuestions],
-  )
-
-  const availableTopics = useMemo(
-    () => [...new Set(questions.map((question) => question.topic))].sort((a, b) => a.localeCompare(b)),
-    [questions],
   )
 
   const loadQuestions = useCallback(async () => {
@@ -46,22 +29,9 @@ function App() {
     }
   }, [filters])
 
-  const loadPapers = useCallback(async () => {
-    try {
-      const { data } = await api.get('/papers')
-      setPapers(data)
-    } catch {
-      setStatus({ type: 'error', message: 'Unable to load saved papers.' })
-    }
-  }, [])
-
   useEffect(() => {
     void loadQuestions()
   }, [loadQuestions])
-
-  useEffect(() => {
-    void loadPapers()
-  }, [loadPapers])
 
   function handleFilterChange(event) {
     const { name, value } = event.target
@@ -87,7 +57,6 @@ function App() {
           topic: question.topic,
           difficulty: question.difficulty,
           marks: question.marks,
-          options: Array.isArray(question.options) ? question.options : [],
           answer: question.answer,
         },
       ]
@@ -124,33 +93,20 @@ function App() {
 
       setActivePaperId(response.data.id)
       setStatus({ type: 'success', message: 'Exam paper saved.' })
-      await loadPapers()
     } catch (error) {
       setStatus({ type: 'error', message: error.response?.data?.message || 'Unable to save paper.' })
     }
   }
 
-  function loadPaperIntoBuilder(paper) {
-    setActivePaperId(paper.id)
-    setPaperMeta({
-      title: paper.title,
-      subject: paper.subject,
-      duration: paper.duration,
-      instructions: paper.instructions,
-    })
-    setSelectedQuestions(
-      paper.questions.map((question) => ({
-        ...question,
-        options: Array.isArray(question.options) ? question.options : [],
-      })),
-    )
-    setStatus({ type: 'success', message: `Loaded paper: ${paper.title}` })
-  }
-
   function createNewPaper() {
     setActivePaperId('')
     setSelectedQuestions([])
-    setPaperMeta({ ...defaultPaperMeta })
+    setPaperMeta({
+      title: 'Midterm Examination',
+      subject: 'Mathematics',
+      duration: '90 minutes',
+      instructions: 'Answer all questions. Show all necessary working.',
+    })
   }
 
   async function downloadPdf() {
@@ -174,25 +130,11 @@ function App() {
   }
 
   return (
-    <>
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/questions" element={<QuestionManagementPage />} />
-          <Route path="/builder" element={<PaperBuilderPage />} />
-          <Route path="/papers" element={<PapersListPage />} />
-        </Routes>
-      </Layout>
-    </Router>
     <div className="app-shell">
       <header className="hero">
         <div>
           <p className="eyebrow">MERN exam generator</p>
-          <h1>Create printable exam papers from your HTML &amp; CSS MCQ bank</h1>
-          <p className="hero-copy">
-            Browse the read-only MCQ bank, curate a paper, print it, or export a polished PDF.
-          </p>
+          <h2>Build Your Paper</h2>
         </div>
         <div className="hero-actions">
           <button onClick={createNewPaper}>New paper</button>
@@ -210,42 +152,13 @@ function App() {
       <main className="workspace-grid">
         <section className="panel">
           <div className="panel-header">
-            <h2>Question source</h2>
-            <span>Read only</span>
-          </div>
-
-          <div className="stack">
-            <p className="readonly-note">
-              The app now uses only the HTML/CSS MCQs loaded from <code>server/src/data/mcqs.js</code>.
-            </p>
-            <div className="grid-2">
-              <div className="stat-card">
-                <strong>{questions.length}</strong>
-                <span>available MCQs</span>
-              </div>
-              <div className="stat-card">
-                <strong>{availableTopics.length}</strong>
-                <span>topics covered</span>
-              </div>
-            </div>
-            <div className="pill-row">
-              {availableTopics.map((topic) => (
-                <span className="pill subtle" key={topic}>
-                  {topic}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="panel">
-          <div className="panel-header">
-            <h2>Question bank</h2>
+            <h2>Available Questions</h2>
             <span>{questions.length} questions</span>
           </div>
 
           <div className="filter-grid">
             <input name="search" value={filters.search} onChange={handleFilterChange} placeholder="Search questions" />
+            <input name="subject" value={filters.subject} onChange={handleFilterChange} placeholder="Filter by subject" />
             <input name="topic" value={filters.topic} onChange={handleFilterChange} placeholder="Filter by topic" />
             <select name="difficulty" value={filters.difficulty} onChange={handleFilterChange}>
               <option value="">All difficulty</option>
@@ -263,13 +176,6 @@ function App() {
                   <span>{question.topic}</span>
                 </div>
                 <p>{question.text}</p>
-                {question.options?.length ? (
-                  <ol className="option-list" type="A">
-                    {question.options.map((option, index) => (
-                      <li key={`${question.id}-${getOptionLabel(index)}`}>{option}</li>
-                    ))}
-                  </ol>
-                ) : null}
                 <div className="pill-row">
                   <span className="pill">{question.difficulty}</span>
                   <span className="pill">{question.marks} marks</span>
@@ -327,13 +233,6 @@ function App() {
                 <div>
                   <strong>Q{index + 1}</strong>
                   <p>{question.text}</p>
-                  {question.options?.length ? (
-                    <ol className="option-list compact-list" type="A">
-                      {question.options.map((option, optionIndex) => (
-                        <li key={`${question.questionId}-${getOptionLabel(optionIndex)}`}>{option}</li>
-                      ))}
-                    </ol>
-                  ) : null}
                   <small>
                     {question.topic} · {question.difficulty} · {question.marks} marks
                   </small>
@@ -353,79 +252,50 @@ function App() {
             ))}
           </div>
         </section>
-      </main>
 
-      <section className="panel saved-papers">
-        <div className="panel-header">
-          <h2>Saved papers</h2>
-          <span>{papers.length} saved</span>
-        </div>
-        <div className="saved-list">
-          {papers.map((paper) => (
-            <button className="saved-card" key={paper.id} onClick={() => loadPaperIntoBuilder(paper)}>
-              <strong>{paper.title}</strong>
-              <span>
-                {paper.subject} · {paper.duration}
-              </span>
-              <span>
-                {paper.questions.length} questions · {paper.totalMarks} marks
-              </span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="panel preview-panel">
-        <div className="panel-header">
-          <h2>Print preview</h2>
-          <span>{activePaperId ? 'Saved paper' : 'Unsaved draft'}</span>
-        </div>
-
-        <div className="print-shell" ref={paperRef}>
-          <div className="paper-header">
-            <h2>{paperMeta.title}</h2>
-            <div className="paper-meta">
-              <span>Subject: {paperMeta.subject}</span>
-              <span>Duration: {paperMeta.duration}</span>
-              <span>Total marks: {totalMarks}</span>
+        <section className="panel print-only">
+          <div ref={paperRef} id="paper-preview" className="paper">
+            <div className="paper-header">
+              <h1>{paperMeta.title}</h1>
+              <div className="paper-meta">
+                <span>Subject: {paperMeta.subject}</span>
+                <span>Duration: {paperMeta.duration}</span>
+                <span>Total Marks: {totalMarks}</span>
+              </div>
             </div>
-            <p>{paperMeta.instructions}</p>
-          </div>
 
-          <ol className="paper-questions">
-            {selectedQuestions.map((question) => (
-              <li key={question.questionId}>
-                <div className="paper-question-line">
-                  <span>{question.text}</span>
-                  <strong>({question.marks} marks)</strong>
+            {paperMeta.instructions ? (
+              <div className="paper-instructions">
+                <h3>Instructions</h3>
+                <p>{paperMeta.instructions}</p>
+              </div>
+            ) : null}
+
+            <div className="paper-questions">
+              {selectedQuestions.map((question, index) => (
+                <div className="paper-question" key={question.questionId}>
+                  <div className="question-number">Q{index + 1}</div>
+                  <div className="question-content">
+                    <p>{question.text}</p>
+                    <div className="marks-box">({question.marks} marks)</div>
+                    <div className="answer-lines">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="line"></div>
+                      ))}
+                    </div>
+                    {question.answer ? (
+                      <div className="paper-only">
+                        <strong>Answer:</strong>
+                        <p>{question.answer}</p>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
-                {question.options?.length ? (
-                  <ol className="paper-options" type="A">
-                    {question.options.map((option, index) => (
-                      <li key={`${question.questionId}-option-${getOptionLabel(index)}`}>{option}</li>
-                    ))}
-                  </ol>
-                ) : null}
-              </li>
-            ))}
-          </ol>
-
-          <div className="answer-key">
-            <h3>Answer key</h3>
-            <ol>
-              {selectedQuestions.map((question) => (
-                <li key={`${question.questionId}-answer`}>
-                  {question.answer || 'No answer key provided.'}
-                </li>
               ))}
-            </ol>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
     </div>
-    </>
-  );
+  )
 }
-
-
-export default App;
