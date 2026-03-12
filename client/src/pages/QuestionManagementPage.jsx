@@ -307,7 +307,7 @@ export default function QuestionManagementPage() {
       {status.message ? <div className={`status ${status.type}`}>{status.message}</div> : null}
 
       <main className="workspace-grid">
-        <section className="panel">
+        {/* <section className="panel">
           <div className="panel-header">
             <h2>Question source</h2>
             <span>Read only</span>
@@ -335,7 +335,7 @@ export default function QuestionManagementPage() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         <section className="panel">
           <div className="panel-header">
@@ -402,6 +402,33 @@ export default function QuestionManagementPage() {
         </section>
 
         <section className="panel">
+          <div className="panel-header">
+            <h2>Question source</h2>
+            <span>Read only</span>
+          </div>
+
+          <div className="stack">
+            <p className="readonly-note">
+              The app uses the read-only MCQ bank files in <code>server/src/data</code>, with separate subject and topic filtering.
+            </p>
+            <div className="grid-2">
+              <div className="stat-card">
+                <strong>{allQuestions.length}</strong>
+                <span>available MCQs</span>
+              </div>
+              <div className="stat-card">
+                <strong>{availableTopics.length}</strong>
+                <span>topics covered</span>
+              </div>
+            </div>
+            <div className="pill-row">
+              {availableTopics.map((topic) => (
+                <span className="pill subtle" key={topic}>
+                  {topic}
+                </span>
+              ))}
+            </div>
+          </div>
           <div className="panel-header">
             <h2>Paper builder</h2>
             <span>{selectedQuestions.length} selected</span>
