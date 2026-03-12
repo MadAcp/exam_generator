@@ -12,7 +12,7 @@ Node/Express/Mongo: 80 Questions (Routes, Middleware, CRUD).
 Tools (Git/Agile/Regex): 60 Questions.
 */
 
-const mcqBank = [
+const htmlCssMcqBank = [
   // --- SOURCE CODE MANAGEMENT: GIT ---
   {
     id: 'git-01',
@@ -1053,4 +1053,4 @@ const mcqBank = [
   }
 ];
 
-module.exports = { mcqBank };
+module.exports = { htmlCssMcqBank };

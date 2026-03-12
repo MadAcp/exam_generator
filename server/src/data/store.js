@@ -1,7 +1,11 @@
 const { randomUUID } = require('crypto');
 const mongoose = require('mongoose');
 const ExamPaper = require('../models/ExamPaper');
-const { mcqBank } = require('./mcqs');
+const { htmlCssMcqBank } = require('./htmlCssMcqBank');
+const { jsdomMcqBank } = require('./jsdomMcqBank');
+const { reactMcqBank } = require('./reactMcqBank');
+
+const mcqBank = htmlCssMcqBank.concat(jsdomMcqBank, reactMcqBank);
 
 let storageMode = 'memory';
 const htmlCssTopics = new Set(['html', 'css', 'html tags', 'css layout', 'flexbox', 'grid']);
