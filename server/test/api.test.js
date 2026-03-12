@@ -16,16 +16,29 @@ test('health endpoint reports memory storage mode by default', async () => {
   assert.equal(response.body.storage, 'memory');
 });
 
-test('question endpoint serves read-only HTML/CSS MCQs from mcqs.js', async () => {
+test('question endpoint serves read-only MCQs with subject and topic filtering', async () => {
   const response = await request(app).get('/api/questions');
 
   assert.equal(response.status, 200);
   assert.ok(response.body.length > 0);
-  assert.ok(response.body.some((question) => question.id === 'hc-01'));
-  assert.ok(response.body.some((question) => question.id === 'html-01'));
-  assert.ok(response.body.every((question) => question.subject === 'HTML & CSS'));
   assert.ok(response.body.every((question) => Array.isArray(question.options) && question.options.length > 0));
-  assert.ok(response.body.every((question) => !['git-01', 'react-01', 'node-01'].includes(question.id)));
+
+  const subjects = new Set(response.body.map((question) => question.subject));
+  assert.ok(subjects.has('HTML & CSS'));
+  assert.ok(subjects.has('JavaScript & DOM'));
+  assert.ok(subjects.has('React'));
+  assert.ok(subjects.has('MERN'));
+
+  const reactResponse = await request(app).get('/api/questions').query({ subject: 'React' });
+  assert.equal(reactResponse.status, 200);
+  assert.ok(reactResponse.body.length > 0);
+  assert.ok(reactResponse.body.every((question) => question.subject === 'React'));
+
+  const hooksResponse = await request(app).get('/api/questions').query({ subject: 'React', topic: 'Hooks' });
+  assert.equal(hooksResponse.status, 200);
+  assert.ok(hooksResponse.body.length > 0);
+  assert.ok(hooksResponse.body.every((question) => question.subject === 'React'));
+  assert.ok(hooksResponse.body.every((question) => question.topic === 'Hooks'));
 
   const createResponse = await request(app).post('/api/questions').send({ text: 'New question' });
   assert.equal(createResponse.status, 405);

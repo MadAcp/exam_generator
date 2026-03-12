@@ -4,47 +4,25 @@ const ExamPaper = require('../models/ExamPaper');
 const { htmlCssMcqBank } = require('./htmlCssMcqBank');
 const { jsdomMcqBank } = require('./jsdomMcqBank');
 const { reactMcqBank } = require('./reactMcqBank');
+const { mernMcqBank } = require('./mernMcqBank');
+const { gitAgileRegexMcqBank } = require('./gitAgileRegexMcqBank');
 
-const mcqBank = htmlCssMcqBank.concat(jsdomMcqBank, reactMcqBank);
+const mcqBanks = [
+  { questions: htmlCssMcqBank, subject: 'HTML & CSS' },
+  { questions: jsdomMcqBank, subject: 'JavaScript & DOM' },
+  { questions: reactMcqBank, subject: 'React' },
+  { questions: mernMcqBank, subject: 'MERN' },
+  { questions: gitAgileRegexMcqBank, subject: 'Git, Agile, Regex' },
+];
 
 let storageMode = 'memory';
-const htmlCssTopics = new Set(['html', 'css', 'html tags', 'css layout', 'flexbox', 'grid']);
-const htmlCssTags = new Set([
-  'html',
-  'html5',
-  'css',
-  'flexbox',
-  'grid',
-  'selectors',
-  'semantics',
-  'box-model',
-  'typography',
-  'layout',
-  'forms',
-]);
 
-function isHtmlCssQuestion(question) {
-  const id = String(question.id || '').trim().toLowerCase();
-  const topic = String(question.topic || '').trim().toLowerCase();
-  const tags = Array.isArray(question.tags)
-    ? question.tags.map((tag) => String(tag).trim().toLowerCase())
-    : [];
-
-  return (
-    id.startsWith('html-') ||
-    id.startsWith('css-') ||
-    id.startsWith('hc-') ||
-    htmlCssTopics.has(topic) ||
-    tags.some((tag) => htmlCssTags.has(tag))
-  );
-}
-
-function prepareMcqQuestion(question) {
+function prepareMcqQuestion(question, defaultSubject) {
   return {
     id: String(question.id),
     text: String(question.text || '').trim(),
-    subject: 'HTML & CSS',
-    topic: String(question.topic || 'HTML & CSS').trim(),
+    subject: String(defaultSubject || question.subject || 'General').trim(),
+    topic: String(question.topic || defaultSubject || 'General').trim(),
     difficulty: String(question.difficulty || 'Medium').trim(),
     marks: Number(question.marks) || 1,
     options: Array.isArray(question.options)
@@ -57,7 +35,9 @@ function prepareMcqQuestion(question) {
   };
 }
 
-const questionBank = mcqBank.filter(isHtmlCssQuestion).map(prepareMcqQuestion);
+const questionBank = mcqBanks.flatMap(({ questions, subject }) =>
+  questions.map((question) => prepareMcqQuestion(question, subject)),
+);
 
 const memoryStore = {
   papers: [],
@@ -124,7 +104,7 @@ function matchesFilter(question, filters) {
 
 async function connectDatabase() {
   if (!process.env.MONGO_URI) {
-    console.log('MONGO_URI not found. Using HTML/CSS MCQs from mcqs.js with in-memory papers.');
+    console.log('MONGO_URI not found. Using read-only MCQ banks from server/src/data with in-memory papers.');
     storageMode = 'memory';
     return storageMode;
   }
