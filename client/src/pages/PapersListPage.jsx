@@ -8,8 +8,9 @@ export default function PapersListPage() {
 
   const loadPapers = useCallback(async () => {
     try {
-      const { data } = await api.get('/papers')
-      setPapers(data)
+      // const { data } = await api.get('/papers')
+      // setPapers(data)
+      setPapers(JSON.parse(localStorage.getItem('exam_papers')) || []);
     } catch {
       setStatus({ type: 'error', message: 'Unable to load saved papers.' })
     }
@@ -21,8 +22,11 @@ export default function PapersListPage() {
 
   async function deletePaper(paperId) {
     try {
-      await api.delete(`/papers/${paperId}`)
-      setStatus({ type: 'success', message: 'Paper deleted.' })
+      const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
+      const updatedPapers = examPapers.filter(paper => paper.id !== paperId)
+      localStorage.setItem('exam_papers', JSON.stringify(updatedPapers))
+      // await api.delete(`/papers/${paperId}`)
+      // setStatus({ type: 'success', message: 'Paper deleted.' })
       await loadPapers()
     } catch {
       setStatus({ type: 'error', message: 'Unable to delete paper.' })
