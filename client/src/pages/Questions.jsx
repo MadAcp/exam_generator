@@ -11,6 +11,7 @@ export default function Questions() {
   const [allQuestions, setAllQuestions] = useState([])
   const [filters, setFilters] = useState({ subject: '', topic: '', difficulty: '', search: '' })
   const [status, setStatus] = useState({ type: 'idle', message: '' })
+  const [expandedRows, setExpandedRows] = useState(null);
   const navigate = useNavigate()
 
   const availableSubjects = useMemo(
@@ -78,6 +79,52 @@ export default function Questions() {
     return <Tag value={rowData.difficulty} severity={severity} />;
   };
 
+  const rowExpansionTemplate = (data) => {
+    return (
+        <div className="expansion-container p-3">
+            <div className="expansion-card">
+                {/* Left Side: Options */}
+                <div className="options-section">
+                    <div className="section-title">OPTIONS</div>
+                    <div className="options-grid">
+                        {data.options.map((opt, index) => {
+                            const isCorrect = data.answer === opt;
+                            return (
+                                <div key={index} className={`option-item ${isCorrect ? 'correct' : ''}`}>
+                                    <span className="option-badge">
+                                        {String.fromCharCode(65 + index)}
+                                    </span>
+                                    <span className="option-text">{opt}</span>
+                                    {isCorrect && <i className="pi pi-check-circle ml-auto text-green-500"></i>}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Right Side: Details */}
+                <div className="details-section">
+                    <div className="section-title">QUESTION DETAILS</div>
+                    <div className="details-content">
+                        <div className="detail-row">
+                            <span className="label">Topic</span>
+                            <span className="value topic-tag">{data.topic}</span>
+                        </div>
+                        <div className="detail-row">
+                            <span className="label">Tags</span>
+                            <div className="tag-container">
+                                {data.tags?.map(tag => (
+                                    <Tag key={tag} value={tag} severity="info" rounded className="text-xs" />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
   return (
     <>
       <div className="app-shell">
@@ -140,7 +187,11 @@ export default function Questions() {
                 tableStyle={{ minWidth: '50rem' }}
                 className="custom-table" // We will style this class
                 dataKey="id"
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+                rowExpansionTemplate={rowExpansionTemplate}
               >
+                <Column expander={true} style={{ width: '3rem' }} />
                 <Column field="subject" header="Subject" style={{ width: '15%' }}></Column>
                 <Column body={questionTemplate} header="Question" style={{ width: '70%' }}></Column>
                 <Column field="difficulty" body={difficultyTemplate} header="Difficulty" style={{ width: '10%' }}></Column>

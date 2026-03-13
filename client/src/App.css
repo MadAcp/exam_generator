@@ -352,6 +352,115 @@ button.danger {
 .custom-table .p-datatable-tbody>tr:hover {
   background: #fcfdfe !important;
 }
+/* Light background for the expansion area */
+.bg-faint-gray {
+    background-color: #fcfdfe;
+}
+
+/* Success color for correct answer indicator */
+.bg-success-fade {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* Style the expansion icon specifically */
+.custom-table .p-row-toggler {
+    height: 2rem;
+    color: #ffffff;
+    transition: transform 0.2s;
+}
+
+.custom-table .p-row-toggler:hover {
+    background: #f1f5f9;
+    color: #2196f3;
+}
+
+/* Ensure the expanded row doesn't have the hover effect of the main rows */
+.custom-table .p-datatable-row-expansion > td {
+    padding: 0 !important; /* Let the inner div handle padding */
+    background: #fcfdfe;
+}
+
+/* Container padding and subtle background */
+.expansion-container {
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* The Card Layout */
+.expansion-card {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.options-section { flex: 1; min-width: 300px; }
+.details-section { flex: 0.8; min-width: 250px; border-left: 1px solid #f1f5f9; padding-left: 2rem; }
+
+.section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+/* Option Items */
+.option-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+}
+
+.option-item.correct {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+.option-badge {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e2e8f0;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-right: 0.75rem;
+}
+
+.correct .option-badge {
+    background: #22c55e;
+    color: white;
+}
+
+/* Details Section */
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.detail-row .label { color: #64748b; }
+.detail-row .value { font-weight: 600; color: #1e293b; }
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .details-section { border-left: none; padding-left: 0; border-top: 1px solid #f1f5f9; padding-top: 1.5rem; }
+}
 
 /* Container for the dropdown */
 .p-paginator .p-dropdown {
