@@ -18,6 +18,7 @@ function getOptionLabel(index) {
 }
 
 
+
 export default function PaperBuilder() {
   const [allQuestions, setAllQuestions] = useState([])
   const [questions, setQuestions] = useState([])
@@ -145,20 +146,24 @@ export default function PaperBuilder() {
 
   async function savePaper() {
     const payload = {
+      id: Date.now().toString(),
       ...paperMeta,
       questions: selectedQuestions,
     }
 
     try {
-      const response = activePaperId
-        ? await api.put(`/papers/${activePaperId}`, payload)
-        : await api.post('/papers', payload)
+      const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
+      examPapers.push(payload)
+      localStorage.setItem('exam_papers', JSON.stringify(examPapers))
 
-      setActivePaperId(response.data.id)
-      setStatus({ type: 'success', message: 'Exam paper saved.' })
-      await loadPapers()
+      setStatus({ type: 'success', message: 'Exam paper saved locally.' })
+      setPaperMeta(defaultPaperMeta);
+      setSelectedQuestions([]);
+      //scroll to top of page to show success message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
     } catch (error) {
-      setStatus({ type: 'error', message: error.response?.data?.message || 'Unable to save paper.' })
+      setStatus({ type: 'error', message: 'Unable to save paper locally.' })
     }
   }
 
@@ -247,11 +252,83 @@ export default function PaperBuilder() {
           </div>
         </header>
 
-        {status.message ? <div className={`status ${status.type}`}>{status.message}</div> : null}
+ {status.message ? <div className={`status ${status.type}`}>{status.message}</div> : null}
 
+
+        <div className="workspace-grid">
+          <section className="panel">
+            <div className="panel-header">
+              <h2>Question source</h2>
+              <span>Read only</span>
+            </div>
+
+            <div className="stack">
+              <p className="readonly-note">
+                The app uses the read-only MCQ bank files in <code>server/src/data</code>, with separate subject and topic filtering.
+              </p>
+              <div className="grid-2">
+                <div className="stat-card">
+                  <strong>{allQuestions.length}</strong>
+                  <span>available MCQs</span>
+                </div>
+                <div className="stat-card">
+                  <strong>{availableTopics.length}</strong>
+                  <span>topics covered</span>
+                </div>
+              </div>
+              <div className="pill-row">
+                {availableTopics.map((topic) => (
+                  <span className="pill subtle" key={topic}>
+                    {topic}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+          </section>
+          <section className="panel">
+            <div className="panel-header">
+              <h2>Paper builder</h2>
+              <span>{selectedQuestions.length} selected</span>
+            </div>
+
+            <div className="stack compact">
+              <div className="grid-2">
+                <label>
+                  Paper title
+                  <input name="title" value={paperMeta.title} onChange={handlePaperMetaChange} />
+                </label>
+                <label>
+                  Subject
+                  <input name="subject" value={paperMeta.subject} onChange={handlePaperMetaChange} />
+                </label>
+              </div>
+              <div className="grid-2">
+                <label>
+                  Duration
+                  <input name="duration" value={paperMeta.duration} onChange={handlePaperMetaChange} />
+                </label>
+                <label>
+                  Total marks
+                  <input value={totalMarks} readOnly />
+                </label>
+              </div>
+              <label>
+                Instructions
+                <textarea name="instructions" rows="3" value={paperMeta.instructions} onChange={handlePaperMetaChange} />
+              </label>
+
+            </div>
+          </section>
+        </div>
+
+
+
+       
         <main className="workspace-grid">
           <section className="panel">
             <div className="panel-header">
+
               <h2>Question bank</h2>
               <span>{questions.length} questions</span>
             </div>
@@ -283,98 +360,41 @@ export default function PaperBuilder() {
             </div>
 
             <div className="question-list">
-              <DataTable 
-                value={questions} 
-                paginator 
-                rows={10} 
+              <DataTable
+                value={questions}
+                paginator
+                rows={10}
                 rowsPerPageOptions={[5, 10, 25, 50]}
                 tableStyle={{ minWidth: '50rem' }}
                 stripedRows
                 // This makes it feel more like "Rows" and less like a static grid
-                className="p-datatable-sm" 
+                className="p-datatable-sm"
               >
                 <Column field="subject"></Column>
                 <Column body={questionTemplate} style={{ width: '50%' }}></Column>
                 <Column field="difficulty" body={difficultyTemplate}></Column>
                 <Column field="marks"></Column>
-                <Column 
-                    header="Action" 
-                    body={(rowData) => (
-                        <Button 
-                            icon="pi pi-plus" 
-                            label="Add" 
-                            className="p-button-rounded p-button-outlined p-button-sm"
-                            onClick={() => addQuestionToPaper(rowData)} 
-                        />
-                    )} 
-                    style={{ width: '15%' }}
+                <Column
+                  header="Action"
+                  body={(rowData) => (
+                    <Button
+                      icon="pi pi-plus"
+                      label="Add"
+                      className="p-button-rounded p-button-outlined p-button-sm"
+                      onClick={() => addQuestionToPaper(rowData)}
+                    />
+                  )}
+                  style={{ width: '15%' }}
                 />
               </DataTable>
             </div>
+            <button onClick={() => void savePaper()}>Save paper</button>
 
           </section>
 
-          <section className="panel">
-            <div className="panel-header">
-              <h2>Question source</h2>
-              <span>Read only</span>
-            </div>
 
-            <div className="stack">
-              <p className="readonly-note">
-                The app uses the read-only MCQ bank files in <code>server/src/data</code>, with separate subject and topic filtering.
-              </p>
-              <div className="grid-2">
-                <div className="stat-card">
-                  <strong>{allQuestions.length}</strong>
-                  <span>available MCQs</span>
-                </div>
-                <div className="stat-card">
-                  <strong>{availableTopics.length}</strong>
-                  <span>topics covered</span>
-                </div>
-              </div>
-              <div className="pill-row">
-                {availableTopics.map((topic) => (
-                  <span className="pill subtle" key={topic}>
-                    {topic}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="panel-header">
-              <h2>Paper builder</h2>
-              <span>{selectedQuestions.length} selected</span>
-            </div>
-
-            <div className="stack compact">
-              <div className="grid-2">
-                <label>
-                  Paper title
-                  <input name="title" value={paperMeta.title} onChange={handlePaperMetaChange} />
-                </label>
-                <label>
-                  Subject
-                  <input name="subject" value={paperMeta.subject} onChange={handlePaperMetaChange} />
-                </label>
-              </div>
-              <div className="grid-2">
-                <label>
-                  Duration
-                  <input name="duration" value={paperMeta.duration} onChange={handlePaperMetaChange} />
-                </label>
-                <label>
-                  Total marks
-                  <input value={totalMarks} readOnly />
-                </label>
-              </div>
-              <label>
-                Instructions
-                <textarea name="instructions" rows="3" value={paperMeta.instructions} onChange={handlePaperMetaChange} />
-              </label>
-              <button onClick={() => void savePaper()}>Save paper</button>
-            </div>
-
+          <section className="builder-section">
+            <h3>Selected questions</h3>
             <div className="builder-list">
               {selectedQuestions.map((question, index) => (
                 <div className="builder-item" key={question.questionId}>
@@ -406,28 +426,11 @@ export default function PaperBuilder() {
                 </div>
               ))}
             </div>
+
           </section>
         </main>
 
-        <section className="panel saved-papers">
-          <div className="panel-header">
-            <h2>Saved papers</h2>
-            <span>{papers.length} saved</span>
-          </div>
-          <div className="saved-list">
-            {papers.map((paper) => (
-              <button className="saved-card" key={paper.id} onClick={() => loadPaperIntoBuilder(paper)}>
-                <strong>{paper.title}</strong>
-                <span>
-                  {paper.subject} · {paper.duration}
-                </span>
-                <span>
-                  {paper.questions.length} questions · {paper.totalMarks} marks
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
+
 
         <section className="panel preview-panel">
           <div className="panel-header">

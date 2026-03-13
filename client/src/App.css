@@ -69,6 +69,12 @@
   gap: 1.5rem;
 }
 
+.builder-section {
+    overflow: scroll;
+    height: 800px;
+}
+
+
 .panel {
   padding: 1.5rem;
 }
