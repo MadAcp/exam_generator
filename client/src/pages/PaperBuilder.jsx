@@ -368,7 +368,7 @@ export default function PaperBuilder() {
                 tableStyle={{ minWidth: '50rem' }}
                 stripedRows
                 // This makes it feel more like "Rows" and less like a static grid
-                className="p-datatable-sm"
+                className="custom-table"
               >
                 <Column field="subject"></Column>
                 <Column body={questionTemplate} style={{ width: '50%' }}></Column>

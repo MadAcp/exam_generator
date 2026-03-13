@@ -135,15 +135,16 @@ export default function Questions() {
                 paginator
                 rows={10}
                 rowsPerPageOptions={[5, 10, 25, 50]}
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                pageLinks={5}
                 tableStyle={{ minWidth: '50rem' }}
-                stripedRows
-                // This makes it feel more like "Rows" and less like a static grid
-                className="p-datatable-sm"
+                className="custom-table" // We will style this class
+                dataKey="id"
               >
-                <Column field="subject" header="Subject"></Column>
-                <Column body={questionTemplate} style={{ width: '50%' }} header="Question"></Column>
-                <Column field="difficulty" body={difficultyTemplate} header="Difficulty"></Column>
-                <Column field="marks" header="Marks"></Column>
+                <Column field="subject" header="Subject" style={{ width: '15%' }}></Column>
+                <Column body={questionTemplate} header="Question" style={{ width: '70%' }}></Column>
+                <Column field="difficulty" body={difficultyTemplate} header="Difficulty" style={{ width: '10%' }}></Column>
+                <Column field="marks" header="Marks" style={{ width: '10%' }}></Column>
               </DataTable>
             </div>
           </section>

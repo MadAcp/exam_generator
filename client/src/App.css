@@ -70,8 +70,8 @@
 }
 
 .builder-section {
-    overflow: scroll;
-    height: 800px;
+  overflow: scroll;
+  height: 800px;
 }
 
 
@@ -299,6 +299,99 @@ button.danger {
   padding-top: 1rem;
 }
 
+/* Remove heavy borders and add clean padding */
+.custom-table .p-datatable-thead>tr>th {
+  background: #f8f9fa;
+  /* Light header background */
+  color: #495057;
+  padding: 1.25rem 1rem;
+  border-bottom: 2px solid #eff2f5;
+  font-weight: 600;
+}
+
+.custom-table .p-datatable-tbody>tr>td {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid #eff2f5;
+  /* Subtle row lines */
+}
+
+/* Fix the Paginator (The blue circles in your "Current" image) */
+.custom-table .p-paginator {
+  background-color: transparent;
+  border: none;
+  padding: 1.5rem;
+  justify-content: center;
+}
+
+.custom-table .p-paginator .p-paginator-pages .p-paginator-page {
+  border-radius: 0;
+  /* Make circles subtle */
+  min-width: 2.5rem;
+  height: 2.5rem;
+  margin: 0 0.3rem;
+  transition: background-color 0.2s;
+}
+
+.custom-table .p-paginator .p-paginator-page.p-highlight {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.custom-table .p-paginator button {
+  border-radius: 0%;
+  /* Make circles subtle */
+  min-width: 2.5rem;
+  height: 2.5rem;
+  margin: 0 0.3rem;
+  transition: background-color 0.2s;
+  background: #e3f2fd;
+  color: #2196f3;
+}
+
+/* Hover effect on rows */
+.custom-table .p-datatable-tbody>tr:hover {
+  background: #fcfdfe !important;
+}
+
+/* Container for the dropdown */
+.p-paginator .p-dropdown {
+    height: 2.5rem;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #dee2e6; /* Subtle border like the "want" image */
+    border-radius: 6px;
+    margin-left: 0.5rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Hover state */
+.p-paginator .p-dropdown:hover {
+    border-color: #2196f3;
+}
+
+/* The label inside the dropdown */
+.p-paginator .p-dropdown .p-dropdown-label {
+    padding: 0 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* The trigger (arrow) area */
+.p-paginator .p-dropdown .p-dropdown-trigger {
+    width: 2rem;
+}
+
+/* Fix the overlay panel (the list that pops up) */
+.p-dropdown-panel {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+    padding: 0.5rem 1rem;
+    margin: 0;
+}
+
 @media (max-width: 1100px) {
   .workspace-grid {
     grid-template-columns: 1fr;
@@ -310,6 +403,7 @@ button.danger {
 }
 
 @media (max-width: 700px) {
+
   .grid-2,
   .filter-grid,
   .paper-meta,
@@ -319,4 +413,3 @@ button.danger {
     display: grid;
   }
 }
-
