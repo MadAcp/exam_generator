@@ -572,6 +572,7 @@ button.danger:disabled {
   margin-top: 2rem;
   border-top: 1px dashed #94a3b8;
   padding-top: 1rem;
+  page-break-before: always;
 }
 
 /* Remove heavy borders and add clean padding */

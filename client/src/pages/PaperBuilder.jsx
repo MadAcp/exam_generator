@@ -38,6 +38,11 @@ export default function PaperBuilder() {
     [selectedQuestions],
   )
 
+  const coveredSubjects = useMemo(
+    () => [...new Set(selectedQuestions.map((question) => question.topic).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
+    [selectedQuestions],
+  )
+
   const availableSubjects = useMemo(
     () => [...new Set(allQuestions.map((question) => question.subject))].sort((a, b) => a.localeCompare(b)),
     [allQuestions],
@@ -582,6 +587,7 @@ export default function PaperBuilder() {
                 <span>Subject: {paperMeta.subject}</span>
                 <span>Duration: {paperMeta.duration}</span>
                 <span>Total marks: {totalMarks}</span>
+                <span>Subjects Covered: {coveredSubjects.length > 0 ? coveredSubjects.join(', ') : 'None'}</span>
               </div>
               <p>{paperMeta.instructions}</p>
             </div>
