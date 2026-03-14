@@ -1,11 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api'
 import './HomePage.css'
 
 export default function HomePage() {
   const [stats, setStats] = useState({ questions: 0, papers: 0 })
+  const [allQuestions, setAllQuestions] = useState([])
   const [loading, setLoading] = useState(true)
+
+  const availableSubjects = useMemo(
+    () => [...new Set(allQuestions.map((question) => question.subject))].sort((a, b) => a.localeCompare(b)),
+    [allQuestions],
+  )
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -14,6 +20,7 @@ export default function HomePage() {
           api.get('/questions'),
           api.get('/papers'),
         ])
+        setAllQuestions(questionsRes.data)
         setStats({
           questions: questionsRes.data.length,
           papers: papersRes.data.length,
@@ -40,6 +47,18 @@ export default function HomePage() {
           <div className="stat-content">
             <p className="stat-label">Total Questions</p>
             <p className="stat-value">{loading ? '...' : stats.questions}</p>
+            <div className="subjects-list">
+              {availableSubjects.map((subject) => (
+                <Link
+                  key={subject}
+                  to={`/questions?subject=${encodeURIComponent(subject)}`}
+                  className="subject-link"
+                  title={`View ${subject} questions`}
+                >
+                  {subject}
+                </Link>
+              ))}
+            </div>
             <Link to="/questions" className="stat-link" title="Manage questions">
               Manage Questions →
             </Link>

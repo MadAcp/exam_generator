@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
@@ -13,6 +13,7 @@ export default function Questions() {
   const [status, setStatus] = useState({ type: 'idle', message: '' })
   const [expandedRows, setExpandedRows] = useState(null);
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const availableSubjects = useMemo(
     () => [...new Set(allQuestions.map((question) => question.subject))].sort((a, b) => a.localeCompare(b)),
@@ -28,6 +29,13 @@ export default function Questions() {
       )].sort((a, b) => a.localeCompare(b)),
     [allQuestions, filters.subject],
   )
+
+  useEffect(() => {
+    const subjectParam = searchParams.get('subject')
+    if (subjectParam) {
+      setFilters((current) => ({ ...current, subject: subjectParam, topic: '' }))
+    }
+  }, [searchParams])
 
   useEffect(() => {
     const loadAllQuestions = async () => {
