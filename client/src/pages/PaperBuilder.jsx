@@ -244,11 +244,11 @@ export default function PaperBuilder() {
             </p>
           </div>
           <div className="hero-actions">
-            <button onClick={createNewPaper}>New paper</button>
-            <button className="secondary" onClick={() => window.print()}>
+            <button onClick={createNewPaper} title="Create a new exam paper">New paper</button>
+            <button className="secondary" onClick={() => window.print()} title="Print the current paper">
               Print paper
             </button>
-            <button className="secondary" onClick={() => void downloadPdf()}>
+            <button className="secondary" onClick={() => void downloadPdf()} title="Export paper as PDF file">
               Export PDF
             </button>
           </div>
@@ -384,13 +384,14 @@ export default function PaperBuilder() {
                       label="Add"
                       className="p-button-rounded p-button-outlined p-button-sm"
                       onClick={() => addQuestionToPaper(rowData)}
+                      title="Add this question to the paper"
                     />
                   )}
                   style={{ width: '15%' }}
                 />
               </DataTable>
             </div>
-            <button onClick={() => void savePaper()}>Save paper</button>
+            <button onClick={() => void savePaper()} title="Save the exam paper">Save paper</button>
 
           </section>
 
@@ -415,13 +416,13 @@ export default function PaperBuilder() {
                     </small>
                   </div>
                   <div className="builder-actions">
-                    <button className="secondary" onClick={() => moveQuestion(index, -1)}>
+                    <button className="secondary" onClick={() => moveQuestion(index, -1)} title="Move question up">
                       ↑
                     </button>
-                    <button className="secondary" onClick={() => moveQuestion(index, 1)}>
+                    <button className="secondary" onClick={() => moveQuestion(index, 1)} title="Move question down">
                       ↓
                     </button>
-                    <button className="danger" onClick={() => removeQuestionFromPaper(question.questionId)}>
+                    <button className="danger" onClick={() => removeQuestionFromPaper(question.questionId)} title="Remove question from paper">
                       Remove
                     </button>
                   </div>

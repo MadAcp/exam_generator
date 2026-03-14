@@ -32,6 +32,19 @@ small {
   margin: 0;
 }
 
+/* Cursor styling for all interactive elements */
+a {
+  cursor: pointer;
+}
+
+button,
+select,
+textarea,
+[role="button"],
+[role="link"] {
+  cursor: pointer;
+}
+
 @media print {
   body {
     background: #ffffff;

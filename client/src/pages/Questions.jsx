@@ -137,7 +137,7 @@ export default function Questions() {
             </p>
           </div>
           <div className="hero-actions">
-            <button onClick={createNewPaper}>Create paper</button>
+            <button onClick={createNewPaper} title="Start creating a new paper">Create paper</button>
           </div>
         </header>
 

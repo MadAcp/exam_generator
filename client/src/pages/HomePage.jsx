@@ -40,7 +40,7 @@ export default function HomePage() {
           <div className="stat-content">
             <p className="stat-label">Total Questions</p>
             <p className="stat-value">{loading ? '...' : stats.questions}</p>
-            <Link to="/questions" className="stat-link">
+            <Link to="/questions" className="stat-link" title="Manage questions">
               Manage Questions →
             </Link>
           </div>
@@ -51,7 +51,7 @@ export default function HomePage() {
           <div className="stat-content">
             <p className="stat-label">Total Papers</p>
             <p className="stat-value">{loading ? '...' : stats.papers}</p>
-            <Link to="/papers" className="stat-link">
+            <Link to="/papers" className="stat-link" title="View saved papers">
               View Papers →
             </Link>
           </div>
@@ -62,7 +62,7 @@ export default function HomePage() {
           <div className="stat-content">
             <p className="stat-label">Create Paper</p>
             <p className="stat-value">Build</p>
-            <Link to="/builder" className="stat-link">
+            <Link to="/builder" className="stat-link" title="Start building a new paper">
               Get Started →
             </Link>
           </div>
@@ -72,15 +72,15 @@ export default function HomePage() {
       <section className="quick-actions">
         <h2>Quick Actions</h2>
         <div className="actions-grid">
-          <Link to="/questions" className="action-btn">
+          <Link to="/questions" className="action-btn" title="Add new questions">
             <span className="action-icon">➕</span>
             Add Question
           </Link>
-          <Link to="/builder" className="action-btn">
+          <Link to="/builder" className="action-btn" title="Build a new exam paper">
             <span className="action-icon">📝</span>
             Build Paper
           </Link>
-          <Link to="/papers" className="action-btn">
+          <Link to="/papers" className="action-btn" title="View all saved papers">
             <span className="action-icon">📋</span>
             View Papers
           </Link>

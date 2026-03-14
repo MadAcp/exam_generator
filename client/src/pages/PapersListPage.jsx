@@ -85,13 +85,13 @@ export default function PapersListPage() {
                     </div>
                   )}
                   <div className="card-actions">
-                    <Link to="/builder" className="button">
+                    <Link to="/builder" className="button" title="Edit this paper">
                       Edit
                     </Link>
-                    <button className="secondary" onClick={() => window.print()}>
+                    <button className="secondary" onClick={() => window.print()} title="Print this paper">
                       Print
                     </button>
-                    <button className="danger" onClick={() => void deletePaper(paper.id)}>
+                    <button className="danger" onClick={() => void deletePaper(paper.id)} title="Delete this paper">
                       Delete
                     </button>
                   </div>

@@ -151,6 +151,10 @@ select {
   box-sizing: border-box;
 }
 
+select {
+  cursor: pointer;
+}
+
 textarea {
   resize: vertical;
 }
@@ -163,6 +167,13 @@ button {
   color: #ffffff;
   font: inherit;
   font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 button.secondary {
@@ -170,8 +181,16 @@ button.secondary {
   color: #0f172a;
 }
 
+button.secondary:hover {
+  background: #cbd5e1;
+}
+
 button.danger {
   background: #dc2626;
+}
+
+button.danger:hover {
+  background: #b91c1c;
 }
 
 .status {
@@ -260,6 +279,14 @@ button.danger {
   text-align: left;
   display: grid;
   gap: 0.35rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.saved-card:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+  transform: translateX(4px);
 }
 
 .preview-panel {
