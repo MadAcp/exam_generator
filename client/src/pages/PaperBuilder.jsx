@@ -245,10 +245,20 @@ export default function PaperBuilder() {
           </div>
           <div className="hero-actions">
             <button onClick={createNewPaper} title="Create a new exam paper">New paper</button>
-            <button className="secondary" onClick={() => window.print()} title="Print the current paper">
+            <button 
+              className="secondary" 
+              onClick={() => window.print()} 
+              title="Print the current paper"
+              disabled={selectedQuestions.length === 0}
+            >
               Print paper
             </button>
-            <button className="secondary" onClick={() => void downloadPdf()} title="Export paper as PDF file">
+            <button 
+              className="secondary" 
+              onClick={() => void downloadPdf()} 
+              title="Export paper as PDF file"
+              disabled={selectedQuestions.length === 0}
+            >
               Export PDF
             </button>
           </div>

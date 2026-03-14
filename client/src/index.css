@@ -60,14 +60,15 @@ textarea,
   }
 
   .print-shell {
-    position: absolute;
-    inset: 0;
+    position: static;
     margin: 0;
     width: 100%;
     max-width: none;
     border: none;
     border-radius: 0;
     box-shadow: none;
+    padding: 0.5in;
+    page-break-after: auto;
   }
 }
 
