@@ -29,7 +29,8 @@ export default function PaperBuilder() {
   const [activePaperId, setActivePaperId] = useState('')
   const [status, setStatus] = useState({ type: 'idle', message: '' })
   const paperRef = useRef(null)
-
+//add use useeffect to get papers from local storage
+ 
   const totalMarks = useMemo(
     () => selectedQuestions.reduce((sum, question) => sum + Number(question.marks || 0), 0),
     [selectedQuestions],
@@ -150,6 +151,7 @@ export default function PaperBuilder() {
       ...paperMeta,
       questions: selectedQuestions,
     }
+//update saved paper when user clicks edit from papers list page
 
     try {
       const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
