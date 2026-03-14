@@ -67,6 +67,14 @@ export default function Questions() {
     navigate('/builder')
   }
 
+  function collapseAll() {
+    setExpandedRows(null)
+  }
+
+  function expandAll() {
+    setExpandedRows(allQuestions)
+  }
+
   // Custom Body Templates to keep the "row" look clean
   const questionTemplate = (rowData) => {
     return (
@@ -182,6 +190,15 @@ export default function Questions() {
                 <option value="Medium">Medium</option>
                 <option value="Hard">Hard</option>
               </select>
+            </div>
+
+            <div className="table-controls">
+              <button className="secondary" onClick={expandAll} title="Expand all question details">
+                Expand all
+              </button>
+              <button className="secondary" onClick={collapseAll} title="Collapse all question details">
+                Collapse all
+              </button>
             </div>
 
             <div className="question-list">
