@@ -28,6 +28,8 @@ export default function PaperBuilder() {
   const [selectedQuestions, setSelectedQuestions] = useState([])
   const [activePaperId, setActivePaperId] = useState('')
   const [status, setStatus] = useState({ type: 'idle', message: '' })
+  const [expandedRows, setExpandedRows] = useState(null)
+  const [expandedSelectedQuestions, setExpandedSelectedQuestions] = useState({})
   const paperRef = useRef(null)
 //add use useeffect to get papers from local storage
  
@@ -55,10 +57,17 @@ export default function PaperBuilder() {
     try {
       const { data } = await api.get('/questions')
       setAllQuestions(data)
+      // Set default subject to first available subject
+      if (data.length > 0) {
+        const subjects = [...new Set(data.map((question) => question.subject))].sort((a, b) => a.localeCompare(b))
+        if (subjects.length > 0 && !filters.subject) {
+          setFilters((current) => ({ ...current, subject: subjects[0], topic: '' }))
+        }
+      }
     } catch {
       setStatus({ type: 'error', message: 'Unable to load question categories. Start the API server and try again.' })
     }
-  }, [])
+  }, [filters.subject])
 
   const loadQuestions = useCallback(async () => {
     try {
@@ -130,6 +139,25 @@ export default function PaperBuilder() {
 
   function removeQuestionFromPaper(questionId) {
     setSelectedQuestions((current) => current.filter((question) => question.questionId !== questionId))
+  }
+
+  function isQuestionSelected(questionId) {
+    return selectedQuestions.some((item) => item.questionId === questionId)
+  }
+
+  function toggleQuestionSelection(question) {
+    if (isQuestionSelected(question.id)) {
+      removeQuestionFromPaper(question.id)
+    } else {
+      addQuestionToPaper(question)
+    }
+  }
+
+  function toggleSelectedQuestionExpansion(questionId) {
+    setExpandedSelectedQuestions((prev) => ({
+      ...prev,
+      [questionId]: !prev[questionId]
+    }))
   }
 
   function moveQuestion(index, direction) {
@@ -230,6 +258,48 @@ export default function PaperBuilder() {
     }[rowData.difficulty];
 
     return <Tag value={rowData.difficulty} severity={severity} />;
+  };
+
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="expansion-container p-3">
+        <div className="expansion-card">
+          {/* Left Side: Options */}
+          <div className="options-section">
+            <div className="section-title">OPTIONS</div>
+            <div className="options-grid">
+              {data.options?.map((opt, index) => {
+                const isCorrect = data.answer === opt;
+                return (
+                  <div key={index} className={`option-item ${isCorrect ? 'correct' : ''}`}>
+                    <span className="option-badge">
+                      {String.fromCharCode(65 + index)}
+                    </span>
+                    <span className="option-text">{opt}</span>
+                    {isCorrect && <i className="pi pi-check-circle ml-auto text-green-500"></i>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right Side: Details */}
+          <div className="details-section">
+            <div className="section-title">QUESTION DETAILS</div>
+            <div className="details-content">
+              <div className="detail-row">
+                <span className="label">Topic</span>
+                <span className="value topic-tag">{data.topic}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Marks</span>
+                <span className="value">{data.marks}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -379,65 +449,119 @@ export default function PaperBuilder() {
                 rowsPerPageOptions={[5, 10, 25, 50]}
                 tableStyle={{ minWidth: '50rem' }}
                 stripedRows
-                // This makes it feel more like "Rows" and less like a static grid
                 className="custom-table"
+                dataKey="id"
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+                rowExpansionTemplate={rowExpansionTemplate}
               >
+                <Column expander={true} style={{ width: '3rem' }} />
                 <Column field="subject"></Column>
-                <Column body={questionTemplate} style={{ width: '50%' }}></Column>
+                <Column body={questionTemplate} style={{ width: '40%' }}></Column>
                 <Column field="difficulty" body={difficultyTemplate}></Column>
                 <Column field="marks"></Column>
                 <Column
                   header="Action"
-                  body={(rowData) => (
-                    <Button
-                      icon="pi pi-plus"
-                      label="Add"
-                      className="p-button-rounded p-button-outlined p-button-sm"
-                      onClick={() => addQuestionToPaper(rowData)}
-                      title="Add this question to the paper"
-                    />
-                  )}
+                  body={(rowData) => {
+                    const selected = isQuestionSelected(rowData.id)
+                    return (
+                      <Button
+                        icon={selected ? "pi pi-trash" : "pi pi-plus"}
+                        label={selected ? "Remove" : "Add"}
+                        className={`p-button-rounded p-button-outlined p-button-sm ${selected ? 'p-button-danger' : ''}`}
+                        onClick={() => toggleQuestionSelection(rowData)}
+                        title={selected ? "Remove this question from the paper" : "Add this question to the paper"}
+                      />
+                    )
+                  }}
                   style={{ width: '15%' }}
                 />
               </DataTable>
             </div>
-            <button onClick={() => void savePaper()} title="Save the exam paper">Save paper</button>
 
           </section>
 
 
           <section className="builder-section">
-            <h3>Selected questions</h3>
-            <div className="builder-list">
-              {selectedQuestions.map((question, index) => (
-                <div className="builder-item" key={question.questionId}>
-                  <div>
-                    <strong>Q{index + 1}</strong>
-                    <p>{question.text}</p>
-                    {question.options?.length ? (
-                      <ol className="option-list compact-list" type="A">
-                        {question.options.map((option, optionIndex) => (
-                          <li key={`${question.questionId}-${getOptionLabel(optionIndex)}`}>{option}</li>
-                        ))}
-                      </ol>
-                    ) : null}
-                    <small>
-                      {question.topic} · {question.difficulty} · {question.marks} marks
-                    </small>
-                  </div>
-                  <div className="builder-actions">
-                    <button className="secondary" onClick={() => moveQuestion(index, -1)} title="Move question up">
-                      ↑
-                    </button>
-                    <button className="secondary" onClick={() => moveQuestion(index, 1)} title="Move question down">
-                      ↓
-                    </button>
-                    <button className="danger" onClick={() => removeQuestionFromPaper(question.questionId)} title="Remove question from paper">
-                      Remove
-                    </button>
-                  </div>
+            <div className="builder-header">
+              <div>
+                <h3>Selected questions</h3>
+                <div className="builder-summary">
+                  <span className="summary-item">
+                    <strong>{selectedQuestions.length}</strong>
+                    <small>Questions</small>
+                  </span>
+                  <span className="summary-item">
+                    <strong>{totalMarks}</strong>
+                    <small>Total Marks</small>
+                  </span>
                 </div>
-              ))}
+              </div>
+              <button 
+                onClick={() => void savePaper()} 
+                title="Save the exam paper"
+                disabled={selectedQuestions.length === 0}
+                className="save-paper-btn"
+              >
+                Save Paper
+              </button>
+            </div>
+            <div className="builder-list">
+              {selectedQuestions.map((question, index) => {
+                const isExpanded = expandedSelectedQuestions[question.questionId]
+                return (
+                  <div className="builder-item" key={question.questionId}>
+                    <div className="builder-item-header" onClick={() => toggleSelectedQuestionExpansion(question.questionId)}>
+                      <div className="builder-item-title">
+                        <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
+                        <strong>Q{index + 1}.</strong>
+                        <span className="question-text">{question.text}</span>
+                        <span className="question-marks">({question.marks}m)</span>
+                      </div>
+                      <div className="builder-actions">
+                        <button className="secondary" onClick={(e) => { e.stopPropagation(); moveQuestion(index, -1); }} title="Move question up">
+                          ↑
+                        </button>
+                        <button className="secondary" onClick={(e) => { e.stopPropagation(); moveQuestion(index, 1); }} title="Move question down">
+                          ↓
+                        </button>
+                        <button className="danger" onClick={(e) => { e.stopPropagation(); removeQuestionFromPaper(question.questionId); }} title="Remove question from paper">
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                    {isExpanded && (
+                      <div className="builder-item-details">
+                        <div className="details-content">
+                          <div className="detail-row">
+                            <span className="label">Topic</span>
+                            <span className="value">{question.topic}</span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="label">Difficulty</span>
+                            <span className="value difficulty-badge">{question.difficulty}</span>
+                          </div>
+                        </div>
+                        {question.options?.length ? (
+                          <div className="options-detail">
+                            <div className="section-title">OPTIONS</div>
+                            <ol className="option-list" type="A">
+                              {question.options.map((option, optionIndex) => {
+                                const isCorrect = question.answer === option;
+                                return (
+                                  <li key={`${question.questionId}-opt-${optionIndex}`} className={isCorrect ? 'correct-answer' : ''}>
+                                    {option} {isCorrect && <span className="answer-indicator">✓</span>}
+                                  </li>
+                                );
+                              })}
+                            </ol>
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
           </section>
