@@ -3,6 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
+import { useReactToPrint } from 'react-to-print';
 import api from '../api'
 import '../App.css'
 
@@ -31,8 +32,8 @@ export default function PaperBuilder() {
   const [expandedRows, setExpandedRows] = useState(null)
   const [expandedSelectedQuestions, setExpandedSelectedQuestions] = useState({})
   const paperRef = useRef(null)
-//add use useeffect to get papers from local storage
- 
+  //add use useeffect to get papers from local storage
+
   const totalMarks = useMemo(
     () => selectedQuestions.reduce((sum, question) => sum + Number(question.marks || 0), 0),
     [selectedQuestions],
@@ -184,7 +185,7 @@ export default function PaperBuilder() {
       ...paperMeta,
       questions: selectedQuestions,
     }
-//update saved paper when user clicks edit from papers list page
+    //update saved paper when user clicks edit from papers list page
 
     try {
       const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
@@ -196,7 +197,7 @@ export default function PaperBuilder() {
       setSelectedQuestions([]);
       //scroll to top of page to show success message
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      
+
     } catch (error) {
       setStatus({ type: 'error', message: 'Unable to save paper locally.' })
     }
@@ -224,6 +225,18 @@ export default function PaperBuilder() {
     setSelectedQuestions([])
     setPaperMeta({ ...defaultPaperMeta })
   }
+
+  const handlePrint = useReactToPrint({
+    contentRef: paperRef,
+    documentTitle: "Exam_Paper",
+    pageStyle: `
+    @page { size: A4; margin: 20mm; }
+    .print-shell { font-family: 'Inter', sans-serif; color: black; }
+    .paper-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; }
+    .paper-question-line { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .answer-key { page-break-before: always; border-top: 1px dashed #ccc; padding-top: 20px; }
+    `
+  });
 
   async function downloadPdf() {
     if (!paperRef.current || selectedQuestions.length === 0) {
@@ -320,17 +333,18 @@ export default function PaperBuilder() {
           </div>
           <div className="hero-actions">
             <button onClick={createNewPaper} title="Create a new exam paper">New paper</button>
-            <button 
-              className="secondary" 
-              onClick={() => window.print()} 
+            <button
+              className="secondary"
+              // onClick={() => window.print()}
+              onClick={handlePrint}
               title="Print the current paper"
               disabled={selectedQuestions.length === 0}
             >
               Print paper
             </button>
-            <button 
-              className="secondary" 
-              onClick={() => void downloadPdf()} 
+            <button
+              className="secondary"
+              onClick={() => void downloadPdf()}
               title="Export paper as PDF file"
               disabled={selectedQuestions.length === 0}
             >
@@ -339,7 +353,7 @@ export default function PaperBuilder() {
           </div>
         </header>
 
- {status.message ? <div className={`status ${status.type}`}>{status.message}</div> : null}
+        {status.message ? <div className={`status ${status.type}`}>{status.message}</div> : null}
 
 
         <div className="workspace-grid">
@@ -411,7 +425,7 @@ export default function PaperBuilder() {
 
 
 
-       
+
         <main className="workspace-grid">
           <section className="panel">
             <div className="panel-header">
@@ -502,8 +516,8 @@ export default function PaperBuilder() {
                   </span>
                 </div>
               </div>
-              <button 
-                onClick={() => void savePaper()} 
+              <button
+                onClick={() => void savePaper()}
                 title="Save the exam paper"
                 disabled={selectedQuestions.length === 0}
                 className="save-paper-btn"
@@ -580,7 +594,7 @@ export default function PaperBuilder() {
             <span>{activePaperId ? 'Saved paper' : 'Unsaved draft'}</span>
           </div>
 
-          <div className="print-shell" ref={paperRef}>
+          <div className="print-shell" id="printable-area" ref={paperRef}>
             <div className="paper-header">
               <h2>{paperMeta.title}</h2>
               <div className="paper-meta">

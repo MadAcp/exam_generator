@@ -543,11 +543,10 @@ button.danger:disabled {
   padding: 2rem;
   border: 1px solid #dbe3f0;
   border-radius: 18px;
-  page-break-after: always;
 }
 
 .print-shell * {
-  page-break-inside: avoid;
+  /* page-break-inside: avoid; */
 }
 
 .paper-header {
@@ -842,5 +841,20 @@ button.danger:disabled {
   .builder-actions {
     width: 100%;
     justify-content: flex-start;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden; /* Hide everything in the body by default */
+  }
+  #printable-area, #printable-area * {
+    visibility: visible; /* Make the target div and its children visible */
+  }
+  #printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
   }
 }
