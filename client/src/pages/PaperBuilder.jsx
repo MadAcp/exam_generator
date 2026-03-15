@@ -65,11 +65,12 @@ export default function PaperBuilder() {
     try {
       const { data } = await api.get('/questions')
       setAllQuestions(data)
-      // Set default subject to first available subject
+      // Set default subject to "HTML & CSS" if it exists, otherwise first available subject
       if (data.length > 0) {
         const subjects = [...new Set(data.map((question) => question.subject))].sort((a, b) => a.localeCompare(b))
         if (subjects.length > 0 && !filters.subject) {
-          setFilters((current) => ({ ...current, subject: subjects[0], topic: '' }))
+          const defaultSubject = subjects.includes('HTML & CSS') ? 'HTML & CSS' : subjects[0]
+          setFilters((current) => ({ ...current, subject: defaultSubject, topic: '' }))
         }
       }
     } catch {
