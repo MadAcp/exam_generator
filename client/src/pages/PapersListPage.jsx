@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { Eye, Edit2, Trash2, Plus } from 'lucide-react'
 import api from '../api'
 
 export default function PapersListPage() {
   const [papers, setPapers] = useState([])
   const [status, setStatus] = useState({ type: 'idle', message: '' })
+  const navigate = useNavigate()
 
   const loadPapers = useCallback(async () => {
     try {
@@ -21,12 +23,15 @@ export default function PapersListPage() {
   }, [loadPapers])
 
   async function deletePaper(paperId) {
+    if (!window.confirm('Are you sure you want to delete this paper?')) {
+      return
+    }
     try {
       const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
       const updatedPapers = examPapers.filter(paper => paper.id !== paperId)
       localStorage.setItem('exam_papers', JSON.stringify(updatedPapers))
       // await api.delete(`/papers/${paperId}`)
-      // setStatus({ type: 'success', message: 'Paper deleted.' })
+      setStatus({ type: 'success', message: 'Paper deleted.' })
       await loadPapers()
     } catch {
       setStatus({ type: 'error', message: 'Unable to delete paper.' })
@@ -40,6 +45,10 @@ export default function PapersListPage() {
           <p className="eyebrow">MERN exam generator</p>
           <h2>Saved Papers</h2>
         </div>
+        <Link to="/builder" className="button" title="Create a new paper">
+          <Plus size={20} />
+          New Paper
+        </Link>
       </header>
 
       {status.message ? <div className={`status ${status.type}`}>{status.message}</div> : null}
@@ -47,58 +56,74 @@ export default function PapersListPage() {
       <main className="workspace-grid">
         <section className="panel">
           <div className="panel-header">
-            <h2>Your Papers</h2>
-            <span>{papers.length} papers</span>
+            <h2>Your Papers ({papers.length})</h2>
           </div>
 
-          <div className="papers-list">
-            {papers.length === 0 ? (
-              <p style={{ textAlign: 'center', color: '#999' }}>
-                No papers saved yet.{' '}
-                <Link to="/builder" style={{ color: '#0066cc' }}>
-                  Create one now
-                </Link>
-              </p>
-            ) : (
-              papers.map((paper) => (
-                <article className="paper-card" key={paper.id}>
-                  <div className="paper-header">
-                    <h3>{paper.title}</h3>
-                    <span className="badge">{paper.subject}</span>
-                  </div>
-                  <div className="paper-details">
-                    <p>
-                      <strong>Questions:</strong> {paper.questions.length}
-                    </p>
-                    <p>
-                      <strong>Duration:</strong> {paper.duration}
-                    </p>
-                    <p>
-                      <strong>Total Marks:</strong>{' '}
-                      {paper.questions.reduce((sum, q) => sum + Number(q.marks || 0), 0)}
-                    </p>
-                  </div>
-                  {paper.instructions && (
-                    <div className="paper-instructions">
-                      <strong>Instructions:</strong>
-                      <p>{paper.instructions}</p>
-                    </div>
-                  )}
-                  <div className="card-actions">
-                    <Link to="/builder" className="button" title="Edit this paper">
-                      Edit
-                    </Link>
-                    <button className="secondary" onClick={() => window.print()} title="Print this paper">
-                      Print
-                    </button>
-                    <button className="danger" onClick={() => void deletePaper(paper.id)} title="Delete this paper">
-                      Delete
-                    </button>
-                  </div>
-                </article>
-              ))
-            )}
-          </div>
+          {papers.length === 0 ? (
+            <div className="empty-state">
+              <p>No papers saved yet.</p>
+              <Link to="/builder" className="button">
+                Create one now
+              </Link>
+            </div>
+          ) : (
+            <div className="papers-table-container">
+              <table className="papers-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Questions</th>
+                    <th>Marks</th>
+                    <th>Duration</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {papers.map((paper) => {
+                    const totalMarks = paper.questions.reduce((sum, q) => sum + Number(q.marks || 0), 0)
+                    return (
+                      <tr key={paper.id} className="paper-row">
+                        <td className="title-cell">{paper.title}</td>
+                        <td className="subject-cell">
+                          <span className="badge">{paper.subject}</span>
+                        </td>
+                        <td className="number-cell">{paper.questions.length}</td>
+                        <td className="number-cell">{totalMarks}</td>
+                        <td className="text-cell">{paper.duration}</td>
+                        <td className="actions-cell">
+                          <button
+                            className="action-button view"
+                            onClick={() => navigate(`/paper/${paper.id}`)}
+                            title="View this paper"
+                          >
+                            <Eye size={16} />
+                            View
+                          </button>
+                          <button
+                            className="action-button edit"
+                            onClick={() => navigate('/builder', { state: { paperId: paper.id } })}
+                            title="Edit this paper"
+                          >
+                            <Edit2 size={16} />
+                            Edit
+                          </button>
+                          <button
+                            className="action-button delete"
+                            onClick={() => void deletePaper(paper.id)}
+                            title="Delete this paper"
+                          >
+                            <Trash2 size={16} />
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       </main>
     </div>

@@ -798,6 +798,423 @@ button.danger:disabled {
   }
 }
 
+/* Papers Table Styles */
+.papers-table-container {
+  overflow-x: auto;
+}
+
+.papers-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.papers-table thead {
+  background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
+  border-bottom: 2px solid #dbeafe;
+}
+
+.papers-table thead th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #1e3a8a;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.papers-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.2s ease;
+}
+
+.papers-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.papers-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.title-cell {
+  font-weight: 600;
+  color: #1e3a8a;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subject-cell {
+  width: 120px;
+}
+
+.number-cell {
+  text-align: center;
+  width: 100px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.text-cell {
+  width: 100px;
+  color: #718096;
+}
+
+.actions-cell {
+  width: 280px;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1e3a8a;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.action-button:hover {
+  background: #dbeafe;
+  border-color: #7dd3fc;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.1);
+}
+
+.action-button.view {
+  color: #0891b2;
+  border-color: #06b6d4;
+}
+
+.action-button.view:hover {
+  background: #cffafe;
+  border-color: #06b6d4;
+}
+
+.action-button.edit {
+  color: #8b5cf6;
+  border-color: #a78bfa;
+}
+
+.action-button.edit:hover {
+  background: #ede9fe;
+  border-color: #a78bfa;
+}
+
+.action-button.delete {
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.action-button.delete:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #718096;
+}
+
+.empty-state p {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+/* View Paper Styles */
+.view-paper-container {
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.view-paper-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
+  border-bottom: 1px solid #dbeafe;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 6px;
+  color: #1e3a8a;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.back-button:hover {
+  background: #dbeafe;
+  border-color: #7dd3fc;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.view-paper-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.view-paper-title {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.view-paper-title h1 {
+  margin: 0 0 1rem;
+  font-size: 2rem;
+  color: #1e3a8a;
+}
+
+.view-paper-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.view-paper-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #475569;
+}
+
+.view-paper-meta strong {
+  color: #1e3a8a;
+}
+
+.view-paper-instructions {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-left: 3px solid #2563eb;
+  border-radius: 4px;
+}
+
+.view-paper-instructions strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #1e3a8a;
+}
+
+.view-paper-instructions p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.view-paper-questions {
+  counter-reset: item;
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+}
+
+.view-paper-questions li {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-left: 3px solid #2563eb;
+  border-radius: 4px;
+  counter-increment: item;
+}
+
+.view-question-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.view-question-text {
+  flex: 1;
+  color: #1e3a8a;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.view-question-marks {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: #059669;
+  background: #ecfdf5;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.view-question-options {
+  margin: 0.75rem 0 0 0;
+  padding-left: 1.5rem;
+  list-style: lower-alpha;
+}
+
+.view-question-options li {
+  margin: 0.5rem 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #475569;
+}
+
+.view-paper-answer-key {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px dashed #e2e8f0;
+}
+
+.view-paper-answer-key h2 {
+  margin: 0 0 1rem;
+  color: #1e3a8a;
+  border-bottom: 2px solid #2563eb;
+  padding-bottom: 0.5rem;
+}
+
+.answer-key-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.answer-key-list li {
+  padding: 0.5rem;
+  background: #dbeafe;
+  border: 1px solid #7dd3fc;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 600;
+  color: #0c4a6e;
+  font-size: 0.9rem;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 1.1rem;
+  color: #475569;
+}
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1rem;
+  text-align: center;
+}
+
+.not-found p {
+  font-size: 1.1rem;
+  color: #475569;
+}
+
+/* Print styles for View Paper */
+@media print {
+  .view-paper-header {
+    display: none !important;
+  }
+
+  .view-paper-content {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .view-paper-instructions {
+    break-inside: avoid;
+  }
+
+  .view-paper-questions li {
+    break-inside: avoid;
+  }
+
+  .view-paper-answer-key {
+    page-break-before: always;
+  }
+}
+
+@media (max-width: 700px) {
+  .papers-table {
+    font-size: 0.85rem;
+  }
+
+  .papers-table thead th,
+  .papers-table tbody td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .title-cell {
+    max-width: 150px;
+  }
+
+  .actions-cell {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .action-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .view-paper-content {
+    padding: 1rem;
+  }
+
+  .view-paper-title h1 {
+    font-size: 1.5rem;
+  }
+
+  .view-paper-meta {
+    gap: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .answer-key-list {
+    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  }
+}
+
 @media (max-width: 700px) {
 
   .grid-2,
