@@ -168,6 +168,18 @@ export default function PaperBuilder() {
     }))
   }
 
+  function expandAllQuestions() {
+    const allExpanded = {}
+    selectedQuestions.forEach((q) => {
+      allExpanded[q.questionId] = true
+    })
+    setExpandedSelectedQuestions(allExpanded)
+  }
+
+  function collapseAllQuestions() {
+    setExpandedSelectedQuestions({})
+  }
+
   function moveQuestion(index, direction) {
     setSelectedQuestions((current) => {
       const nextIndex = index + direction
@@ -181,13 +193,40 @@ export default function PaperBuilder() {
     })
   }
 
+  function validatePaper() {
+    if (!paperMeta.title.trim()) {
+      setStatus({ type: 'error', message: 'Please enter a paper title.' })
+      return false
+    }
+    if (!paperMeta.subject.trim()) {
+      setStatus({ type: 'error', message: 'Please enter a subject.' })
+      return false
+    }
+    if (!paperMeta.duration.trim()) {
+      setStatus({ type: 'error', message: 'Please enter the duration.' })
+      return false
+    }
+    if (!paperMeta.instructions.trim()) {
+      setStatus({ type: 'error', message: 'Please enter instructions.' })
+      return false
+    }
+    if (selectedQuestions.length === 0) {
+      setStatus({ type: 'error', message: 'Please add at least one question to the paper.' })
+      return false
+    }
+    return true
+  }
+
   async function savePaper() {
+    if (!validatePaper()) {
+      return
+    }
+
     const payload = {
       id: Date.now().toString(),
       ...paperMeta,
       questions: selectedQuestions,
     }
-//update saved paper when user clicks edit from papers list page
 
     try {
       const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
@@ -197,8 +236,11 @@ export default function PaperBuilder() {
       setStatus({ type: 'success', message: 'Exam paper saved locally.' })
       setPaperMeta(defaultPaperMeta);
       setSelectedQuestions([]);
+      setExpandedSelectedQuestions({})
       //scroll to top of page to show success message
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 0)
       
     } catch (error) {
       setStatus({ type: 'error', message: 'Unable to save paper locally.' })
@@ -385,18 +427,21 @@ export default function PaperBuilder() {
             <div className="stack compact">
               <div className="grid-2">
                 <label>
-                  Paper title
-                  <input name="title" value={paperMeta.title} onChange={handlePaperMetaChange} />
+                  Paper title <span style={{color: 'red'}}>*</span>
+                  <input name="title" value={paperMeta.title} onChange={handlePaperMetaChange} placeholder="Enter paper title" />
+                  {!paperMeta.title.trim() && <small style={{color: 'red'}}>Title is required</small>}
                 </label>
                 <label>
-                  Subject
-                  <input name="subject" value={paperMeta.subject} onChange={handlePaperMetaChange} />
+                  Subject <span style={{color: 'red'}}>*</span>
+                  <input name="subject" value={paperMeta.subject} onChange={handlePaperMetaChange} placeholder="Enter subject" />
+                  {!paperMeta.subject.trim() && <small style={{color: 'red'}}>Subject is required</small>}
                 </label>
               </div>
               <div className="grid-2">
                 <label>
-                  Duration
-                  <input name="duration" value={paperMeta.duration} onChange={handlePaperMetaChange} />
+                  Duration <span style={{color: 'red'}}>*</span>
+                  <input name="duration" value={paperMeta.duration} onChange={handlePaperMetaChange} placeholder="e.g., 60 minutes" />
+                  {!paperMeta.duration.trim() && <small style={{color: 'red'}}>Duration is required</small>}
                 </label>
                 <label>
                   Total marks
@@ -404,8 +449,9 @@ export default function PaperBuilder() {
                 </label>
               </div>
               <label>
-                Instructions
-                <textarea name="instructions" rows="3" value={paperMeta.instructions} onChange={handlePaperMetaChange} />
+                Instructions <span style={{color: 'red'}}>*</span>
+                <textarea name="instructions" rows="3" value={paperMeta.instructions} onChange={handlePaperMetaChange} placeholder="Enter instructions for the paper" />
+                {!paperMeta.instructions.trim() && <small style={{color: 'red'}}>Instructions are required</small>}
               </label>
 
             </div>
@@ -505,15 +551,39 @@ export default function PaperBuilder() {
                   </span>
                 </div>
               </div>
-              <button 
-                onClick={() => void savePaper()} 
-                title="Save the exam paper"
-                disabled={selectedQuestions.length === 0}
-                className="save-paper-btn"
-              >
-                Save Paper
-              </button>
+              <div className="header-actions">
+                <button 
+                  onClick={expandAllQuestions} 
+                  title="Expand all questions"
+                  disabled={selectedQuestions.length === 0}
+                  className="secondary"
+                >
+                  Expand All
+                </button>
+                <button 
+                  onClick={collapseAllQuestions} 
+                  title="Collapse all questions"
+                  disabled={selectedQuestions.length === 0}
+                  className="secondary"
+                >
+                  Collapse All
+                </button>
+                <button 
+                  onClick={() => void savePaper()} 
+                  title="Save the exam paper"
+                  disabled={selectedQuestions.length === 0}
+                  className="save-paper-btn"
+                >
+                  Save Paper
+                </button>
+              </div>
             </div>
+            {selectedQuestions.length === 0 && (
+              <div className="empty-state" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                <p>No questions selected yet.</p>
+                <p><small>Select questions from the question bank to create your paper.</small></p>
+              </div>
+            )}
             <div className="builder-list">
               {selectedQuestions.map((question, index) => {
                 const isExpanded = expandedSelectedQuestions[question.questionId]
