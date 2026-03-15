@@ -93,6 +93,7 @@ export default function PaperBuilderPage() {
 
       setActivePaperId(response.data.id)
       setStatus({ type: 'success', message: 'Exam paper saved.' })
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
       setStatus({ type: 'error', message: error.response?.data?.message || 'Unable to save paper.' })
     }

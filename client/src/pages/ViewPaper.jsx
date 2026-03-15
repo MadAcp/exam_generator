@@ -106,7 +106,7 @@ export default function ViewPaper() {
             </span>
             {coveredSubjects.length > 0 && (
               <span>
-                <strong>Topics Covered:</strong> {coveredSubjects.join(', ')}
+                <strong>Subjects Covered:</strong> {coveredSubjects.join(', ')}
               </span>
             )}
           </div>
