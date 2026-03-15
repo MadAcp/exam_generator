@@ -606,6 +606,20 @@ export default function PaperBuilder() {
               <p>{paperMeta.instructions}</p>
             </div>
 
+            {/* /* Only to use for styled header */}
+            {/* <div className="paper-header">
+              <img src="/dnyandeep.png" alt="Logo" className="header-logo" />
+              <div className="header-text">
+                <h2>{paperMeta.title}</h2>
+                <div className="paper-meta">
+                  <span><strong>Subject:</strong> {paperMeta.subject}</span>
+                  <span><strong>Duration:</strong> {paperMeta.duration}</span>
+                  <span><strong>Total Marks:</strong> {totalMarks}</span>
+                  <span><strong>Date:</strong> {new Date().toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div> */}
+
             <ol className="paper-questions">
               {selectedQuestions.map((question) => (
                 <li key={question.questionId}>
