@@ -8,6 +8,10 @@ export default function HomePage() {
   const [allQuestions, setAllQuestions] = useState([])
   const [loading, setLoading] = useState(true)
 
+  useEffect(() => {
+    document.title = 'Home - Exam Generator'
+  }, [])
+
   const availableSubjects = useMemo(
     () => [...new Set(allQuestions.map((question) => question.subject))].sort((a, b) => a.localeCompare(b)),
     [allQuestions],

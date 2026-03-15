@@ -31,8 +31,11 @@ export default function PaperBuilder() {
   const [expandedRows, setExpandedRows] = useState(null)
   const [expandedSelectedQuestions, setExpandedSelectedQuestions] = useState({})
   const paperRef = useRef(null)
-//add use useeffect to get papers from local storage
- 
+
+  useEffect(() => {
+    document.title = 'Build Paper - Exam Generator'
+  }, [])
+
   const totalMarks = useMemo(
     () => selectedQuestions.reduce((sum, question) => sum + Number(question.marks || 0), 0),
     [selectedQuestions],

@@ -8,6 +8,10 @@ export default function PapersListPage() {
   const [status, setStatus] = useState({ type: 'idle', message: '' })
   const navigate = useNavigate()
 
+  useEffect(() => {
+    document.title = 'My Papers - Exam Generator'
+  }, [])
+
   const loadPapers = useCallback(async () => {
     try {
       // const { data } = await api.get('/papers')

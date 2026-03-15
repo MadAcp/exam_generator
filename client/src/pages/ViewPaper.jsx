@@ -13,6 +13,7 @@ export default function ViewPaper() {
     const foundPaper = papers.find((p) => p.id === paperId)
     if (foundPaper) {
       setPaper(foundPaper)
+      document.title = `${foundPaper.title} - Exam Generator`
     }
     setLoading(false)
   }, [paperId])

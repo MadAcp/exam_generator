@@ -8,6 +8,9 @@ import '../App.css'
 import styles from './Questions.module.css'
 
 export default function Questions() {
+  useEffect(() => {
+    document.title = 'Question Bank - Exam Generator'
+  }, [])
   const [allQuestions, setAllQuestions] = useState([])
   const [filters, setFilters] = useState({ subject: '', topic: '', difficulty: '', search: '' })
   const [status, setStatus] = useState({ type: 'idle', message: '' })
