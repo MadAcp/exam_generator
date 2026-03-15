@@ -71,8 +71,25 @@
 }
 
 .builder-section {
-  overflow: scroll;
+  display: flex;
+  flex-direction: column;
   height: 800px;
+}
+
+.builder-header-container {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.builder-questions-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
 
 .builder-header {

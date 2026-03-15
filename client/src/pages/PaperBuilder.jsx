@@ -537,55 +537,58 @@ export default function PaperBuilder() {
 
 
           <section className="builder-section">
-            <div className="builder-header">
-              <div>
-                <h3>Selected questions</h3>
-                <div className="builder-summary">
-                  <span className="summary-item">
-                    <strong>{selectedQuestions.length}</strong>
-                    <small>Questions</small>
-                  </span>
-                  <span className="summary-item">
-                    <strong>{totalMarks}</strong>
-                    <small>Total Marks</small>
-                  </span>
+            <div className="builder-header-container">
+              <div className="builder-header">
+                <div>
+                  <h3>Selected questions</h3>
+                  <div className="builder-summary">
+                    <span className="summary-item">
+                      <strong>{selectedQuestions.length}</strong>
+                      <small>Questions</small>
+                    </span>
+                    <span className="summary-item">
+                      <strong>{totalMarks}</strong>
+                      <small>Total Marks</small>
+                    </span>
+                  </div>
+                </div>
+                <div className="header-actions">
+                  <button 
+                    onClick={expandAllQuestions} 
+                    title="Expand all questions"
+                    disabled={selectedQuestions.length === 0}
+                    className="secondary"
+                  >
+                    Expand All
+                  </button>
+                  <button 
+                    onClick={collapseAllQuestions} 
+                    title="Collapse all questions"
+                    disabled={selectedQuestions.length === 0}
+                    className="secondary"
+                  >
+                    Collapse All
+                  </button>
+                  <button 
+                    onClick={() => void savePaper()} 
+                    title="Save the exam paper"
+                    disabled={selectedQuestions.length === 0}
+                    className="save-paper-btn"
+                  >
+                    Save Paper
+                  </button>
                 </div>
               </div>
-              <div className="header-actions">
-                <button 
-                  onClick={expandAllQuestions} 
-                  title="Expand all questions"
-                  disabled={selectedQuestions.length === 0}
-                  className="secondary"
-                >
-                  Expand All
-                </button>
-                <button 
-                  onClick={collapseAllQuestions} 
-                  title="Collapse all questions"
-                  disabled={selectedQuestions.length === 0}
-                  className="secondary"
-                >
-                  Collapse All
-                </button>
-                <button 
-                  onClick={() => void savePaper()} 
-                  title="Save the exam paper"
-                  disabled={selectedQuestions.length === 0}
-                  className="save-paper-btn"
-                >
-                  Save Paper
-                </button>
-              </div>
             </div>
-            {selectedQuestions.length === 0 && (
-              <div className="empty-state" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-                <p>No questions selected yet.</p>
-                <p><small>Select questions from the question bank to create your paper.</small></p>
-              </div>
-            )}
-            <div className="builder-list">
-              {selectedQuestions.map((question, index) => {
+            <div className="builder-questions-container">
+              {selectedQuestions.length === 0 && (
+                <div className="empty-state" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                  <p>No questions selected yet.</p>
+                  <p><small>Select questions from the question bank to create your paper.</small></p>
+                </div>
+              )}
+              <div className="builder-list">
+                {selectedQuestions.map((question, index) => {
                 const isExpanded = expandedSelectedQuestions[question.questionId]
                 return (
                   <div className="builder-item" key={question.questionId}>
@@ -640,8 +643,8 @@ export default function PaperBuilder() {
                   </div>
                 );
               })}
+              </div>
             </div>
-
           </section>
         </main>
 
