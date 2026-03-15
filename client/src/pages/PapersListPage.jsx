@@ -46,7 +46,7 @@ export default function PapersListPage() {
     <div className="app-shell">
       <header className="hero">
         <div>
-          <p className="eyebrow">MERN exam generator</p>
+          <p className="eyebrow">Exam Generator</p>
           <h2>Saved Papers</h2>
         </div>
         <Link to="/builder" className="button" title="Create a new paper">

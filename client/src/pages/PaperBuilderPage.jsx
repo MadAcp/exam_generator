@@ -134,7 +134,7 @@ export default function PaperBuilderPage() {
     <div className="app-shell">
       <header className="hero">
         <div>
-          <p className="eyebrow">MERN exam generator</p>
+          <p className="eyebrow">Exam Generator</p>
           <h2>Build Your Paper</h2>
         </div>
         <div className="hero-actions">

@@ -207,7 +207,7 @@ export default function QuestionManagementPage() {
     <div className="app-shell">
       <header className="hero">
         <div>
-          <p className="eyebrow">MERN exam generator</p>
+          <p className="eyebrow">Exam Generator</p>
           <h1>Create printable exam papers from your MCQ banks</h1>
           <p className="hero-copy">
             Browse subject-wise MCQ banks, choose a topic, curate a paper, and export a polished PDF.

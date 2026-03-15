@@ -68,15 +68,16 @@ export default function PaperBuilder() {
       // Set default subject to "HTML & CSS" if it exists, otherwise first available subject
       if (data.length > 0) {
         const subjects = [...new Set(data.map((question) => question.subject))].sort((a, b) => a.localeCompare(b))
-        if (subjects.length > 0 && !filters.subject) {
+        setFilters((current) => {
+          if (current.subject) return current // Don't override if already set
           const defaultSubject = subjects.includes('HTML & CSS') ? 'HTML & CSS' : subjects[0]
-          setFilters((current) => ({ ...current, subject: defaultSubject, topic: '' }))
-        }
+          return { ...current, subject: defaultSubject, topic: '' }
+        })
       }
     } catch {
       setStatus({ type: 'error', message: 'Unable to load question categories. Start the API server and try again.' })
     }
-  }, [filters.subject])
+  }, [])
 
   const loadQuestions = useCallback(async () => {
     try {
@@ -358,7 +359,7 @@ export default function PaperBuilder() {
       <div className="app-shell">
         <header className="hero">
           <div>
-            <p className="eyebrow">MERN exam generator</p>
+            <p className="eyebrow">Exam Generator</p>
             <h1>Create printable exam papers from your MCQ banks</h1>
             <p className="hero-copy">
               Browse subject-wise MCQ banks, choose a topic, curate a paper, and export a polished PDF.
