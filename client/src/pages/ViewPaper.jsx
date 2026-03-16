@@ -70,7 +70,7 @@ export default function ViewPaper() {
   }
 
   const totalMarks = paper.questions.reduce((sum, q) => sum + Number(q.marks || 0), 0)
-  const coveredSubjects = [...new Set(paper.questions.map((q) => q.topic).filter(Boolean))].sort((a, b) =>
+  const coveredSubjects = [...new Set(paper.questions.map((q) => q.subject).filter(Boolean))].sort((a, b) =>
     a.localeCompare(b),
   )
 

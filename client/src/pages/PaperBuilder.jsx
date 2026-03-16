@@ -72,7 +72,7 @@ export default function PaperBuilder() {
   )
 
   const coveredSubjects = useMemo(
-    () => [...new Set(selectedQuestions.map((question) => question.topic).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
+    () => [...new Set(selectedQuestions.map((question) => question.subject).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
     [selectedQuestions],
   )
 
@@ -167,6 +167,7 @@ export default function PaperBuilder() {
         {
           questionId: question.id,
           text: question.text,
+          subject: question.subject,
           topic: question.topic,
           difficulty: question.difficulty,
           marks: question.marks,
@@ -547,6 +548,7 @@ export default function PaperBuilder() {
 
             <div className="question-list">
               <DataTable
+                key={selectedQuestions.length}
                 value={questions}
                 paginator
                 rows={10}
@@ -558,6 +560,7 @@ export default function PaperBuilder() {
                 expandedRows={expandedRows}
                 onRowToggle={(e) => setExpandedRows(e.data)}
                 rowExpansionTemplate={rowExpansionTemplate}
+                responsiveLayout="scroll"
               >
                 <Column expander={true} style={{ width: '3rem' }} />
                 <Column field="subject"></Column>
@@ -567,9 +570,10 @@ export default function PaperBuilder() {
                 <Column
                   header="Action"
                   body={(rowData) => {
-                    const selected = isQuestionSelected(rowData.id)
+                    const selected = selectedQuestions.some((item) => item.questionId === rowData.id)
                     return (
                       <Button
+                        key={`${rowData.id}-${selected}`}
                         icon={selected ? "pi pi-trash" : "pi pi-plus"}
                         label={selected ? "Remove" : "Add"}
                         className={`p-button-rounded p-button-outlined p-button-sm ${selected ? 'p-button-danger' : ''}`}
