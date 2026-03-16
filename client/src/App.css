@@ -412,6 +412,36 @@ button:hover {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 1.1rem;
+  background: #2563eb;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.button.secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.button.secondary:hover {
+  background: #cbd5e1;
+}
+
 button.secondary {
   background: #e2e8f0;
   color: #0f172a;
@@ -1018,7 +1048,7 @@ button.danger:disabled {
 }
 
 .icon-button.delete:hover {
-  background-color: #fcccccc;
+  background-color: #fecaca;
   color: #7f1d1d;
 }
 
@@ -1066,17 +1096,6 @@ button.danger:disabled {
   font-size: 0.85rem;
 }
 
-/* Old Grid Styles - Hidden */
-  display: flex;
-  flex-direction: column;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  hover: transform 0.3s ease;
-}
 
 .paper-card:hover {
   border-color: #3b82f6;
