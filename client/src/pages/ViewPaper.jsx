@@ -1,12 +1,14 @@
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { ArrowLeft, Download, Printer } from 'lucide-react'
+import Modal from '../components/Modal'
 
 export default function ViewPaper() {
   const { paperId } = useParams()
   const navigate = useNavigate()
   const [paper, setPaper] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [errorModalOpen, setErrorModalOpen] = useState(false)
 
   useEffect(() => {
     const papers = JSON.parse(localStorage.getItem('exam_papers')) || []
@@ -30,7 +32,7 @@ export default function ViewPaper() {
   const handleDownloadPdf = async () => {
     const { html2pdf } = window
     if (!html2pdf) {
-      alert('PDF download feature is not available')
+      setErrorModalOpen(true)
       return
     }
 
@@ -148,6 +150,16 @@ export default function ViewPaper() {
           </ol>
         </div>
       </main>
+
+      <Modal
+        isOpen={errorModalOpen}
+        title="PDF Download Unavailable"
+        type="error"
+        message="PDF download feature is not available. Please use the print function to save as PDF instead."
+        confirmText="OK"
+        showCancel={false}
+        onConfirm={() => setErrorModalOpen(false)}
+      />
     </div>
   )
 }

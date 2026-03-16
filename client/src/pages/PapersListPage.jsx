@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, Edit2, Trash2, Plus } from 'lucide-react'
 import api from '../api'
+import Modal from '../components/Modal'
 
 export default function PapersListPage() {
   const [papers, setPapers] = useState([])
@@ -9,6 +10,8 @@ export default function PapersListPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [entriesPerPage, setEntriesPerPage] = useState(10)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [paperIdToDelete, setPaperIdToDelete] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -29,17 +32,21 @@ export default function PapersListPage() {
     void loadPapers()
   }, [loadPapers])
 
-  async function deletePaper(paperId) {
-    if (!window.confirm('Are you sure you want to delete this paper?')) {
-      return
-    }
+  function openDeleteModal(paperId) {
+    setPaperIdToDelete(paperId)
+    setDeleteModalOpen(true)
+  }
+
+  async function confirmDelete() {
+    setDeleteModalOpen(false)
     try {
       const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
-      const updatedPapers = examPapers.filter(paper => paper.id !== paperId)
+      const updatedPapers = examPapers.filter(paper => paper.id !== paperIdToDelete)
       localStorage.setItem('exam_papers', JSON.stringify(updatedPapers))
-      // await api.delete(`/papers/${paperId}`)
+      // await api.delete(`/papers/${paperIdToDelete}`)
       setStatus({ type: 'success', message: 'Paper deleted.' })
       await loadPapers()
+      setPaperIdToDelete(null)
     } catch {
       setStatus({ type: 'error', message: 'Unable to delete paper.' })
     }
@@ -163,7 +170,7 @@ export default function PapersListPage() {
                               </button>
                               <button
                                 className="icon-button delete"
-                                onClick={() => void deletePaper(paper.id)}
+                                onClick={() => openDeleteModal(paper.id)}
                                 title="Delete this paper"
                               >
                                 <Trash2 size={16} />
@@ -219,6 +226,17 @@ export default function PapersListPage() {
           )}
         </div>
       </main>
+
+      <Modal
+        isOpen={deleteModalOpen}
+        title="Delete Paper"
+        type="warning"
+        message="Are you sure you want to delete this paper? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteModalOpen(false)}
+      />
     </div>
   )
 }
