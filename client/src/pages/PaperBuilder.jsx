@@ -659,23 +659,39 @@ export default function PaperBuilder() {
           </div>
 
           <div className="print-shell" ref={paperRef}>
-            <div className="paper-header">
-              <h2>{paperMeta.title}</h2>
+            <div className="paper-title">
+              <h1>{paperMeta.title}</h1>
               <div className="paper-meta">
-                <span>Subject: {paperMeta.subject}</span>
-                <span>Duration: {paperMeta.duration}</span>
-                <span>Total marks: {totalMarks}</span>
-                <span>Subjects Covered: {coveredSubjects.length > 0 ? coveredSubjects.join(', ') : 'None'}</span>
+                <span className="badge">{paperMeta.subject}</span>
+                <span>
+                  <strong>Questions:</strong> {selectedQuestions.length}
+                </span>
+                <span>
+                  <strong>Duration:</strong> {paperMeta.duration}
+                </span>
+                <span>
+                  <strong>Total Marks:</strong> {totalMarks}
+                </span>
+                {coveredSubjects.length > 0 && (
+                  <span>
+                    <strong>Subjects Covered:</strong> {coveredSubjects.join(', ')}
+                  </span>
+                )}
               </div>
-              <p>{paperMeta.instructions}</p>
+              {paperMeta.instructions && (
+                <div className="paper-instructions">
+                  <strong>Instructions:</strong>
+                  <p>{paperMeta.instructions}</p>
+                </div>
+              )}
             </div>
 
-            <ol className="paper-questions">
+            <ol className="paper-questions-list">
               {selectedQuestions.map((question) => (
                 <li key={question.questionId}>
                   <div className="paper-question-line">
-                    <span>{question.text}</span>
-                    <strong>({question.marks} marks)</strong>
+                    <span className="paper-question-text">{question.text}</span>
+                    <span className="paper-question-marks">({question.marks} marks)</span>
                   </div>
                   {question.options?.length ? (
                     <ol className="paper-options" type="A">
@@ -688,12 +704,12 @@ export default function PaperBuilder() {
               ))}
             </ol>
 
-            <div className="answer-key">
-              <h3>Answer key</h3>
-              <ol>
+            <div className="paper-answer-key">
+              <h2>Answer Key</h2>
+              <ol className="answer-key-list">
                 {selectedQuestions.map((question) => (
                   <li key={`${question.questionId}-answer`}>
-                    {question.answer || 'No answer key provided.'}
+                    {getOptionLabel(Number(question.correctAnswer) || 0)}
                   </li>
                 ))}
               </ol>

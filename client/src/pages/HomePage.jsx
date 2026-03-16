@@ -20,14 +20,13 @@ export default function HomePage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [questionsRes, papersRes] = await Promise.all([
-          api.get('/questions'),
-          api.get('/papers'),
-        ])
+        const questionsRes = await api.get('/questions')
+        const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
+        
         setAllQuestions(questionsRes.data)
         setStats({
           questions: questionsRes.data.length,
-          papers: papersRes.data.length,
+          papers: examPapers.length,
         })
       } catch (error) {
         console.error('Failed to fetch stats:', error)
