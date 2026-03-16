@@ -163,7 +163,7 @@ export default function PapersListPage() {
                               </button>
                               <button
                                 className="icon-button edit"
-                                onClick={() => navigate('/builder', { state: { paperId: paper.id } })}
+                                onClick={() => navigate(`/builder?id=${paper.id}`)}
                                 title="Edit this paper"
                               >
                                 <Edit2 size={16} />

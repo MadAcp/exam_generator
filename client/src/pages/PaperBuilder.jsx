@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
@@ -20,6 +21,10 @@ function getOptionLabel(index) {
 
 
 export default function PaperBuilder() {
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const paperId = searchParams.get('id')
+  
   const [allQuestions, setAllQuestions] = useState([])
   const [questions, setQuestions] = useState([])
   const [papers, setPapers] = useState([])
@@ -34,7 +39,32 @@ export default function PaperBuilder() {
 
   useEffect(() => {
     document.title = 'Build Paper - Exam Generator'
-  }, [])
+    // Load paper from URL parameter if present
+    if (paperId) {
+      const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
+      const paperToLoad = examPapers.find((paper) => paper.id === paperId)
+      if (paperToLoad) {
+        // This will be called by loadPaperIntoBuilder after it's defined
+        setActivePaperId(paperToLoad.id)
+        setPaperMeta({
+          title: paperToLoad.title,
+          subject: paperToLoad.subject,
+          duration: paperToLoad.duration,
+          instructions: paperToLoad.instructions,
+        })
+        setSelectedQuestions(
+          paperToLoad.questions.map((question) => ({
+            ...question,
+            options: Array.isArray(question.options) ? question.options : [],
+            correctAnswer: question.correctAnswer !== undefined ? question.correctAnswer : question.answer,
+          })),
+        )
+        setStatus({ type: 'success', message: `Loaded paper: ${paperToLoad.title}` })
+      } else {
+        setStatus({ type: 'error', message: 'Paper not found.' })
+      }
+    }
+  }, [paperId])
 
   const totalMarks = useMemo(
     () => selectedQuestions.reduce((sum, question) => sum + Number(question.marks || 0), 0),
@@ -224,21 +254,39 @@ export default function PaperBuilder() {
       return
     }
 
-    const payload = {
-      id: Date.now().toString(),
-      ...paperMeta,
-      questions: selectedQuestions,
-    }
-
+    const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
+    
     try {
-      const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
-      examPapers.push(payload)
+      if (activePaperId) {
+        // Update existing paper
+        const paperIndex = examPapers.findIndex((paper) => paper.id === activePaperId)
+        if (paperIndex !== -1) {
+          examPapers[paperIndex] = {
+            ...examPapers[paperIndex],
+            ...paperMeta,
+            questions: selectedQuestions,
+          }
+          setStatus({ type: 'success', message: 'Exam paper updated successfully.' })
+        }
+      } else {
+        // Save new paper
+        const payload = {
+          id: Date.now().toString(),
+          ...paperMeta,
+          questions: selectedQuestions,
+        }
+        examPapers.push(payload)
+        setStatus({ type: 'success', message: 'Exam paper saved locally.' })
+      }
+      
       localStorage.setItem('exam_papers', JSON.stringify(examPapers))
-
-      setStatus({ type: 'success', message: 'Exam paper saved locally.' })
-      setPaperMeta(defaultPaperMeta);
-      setSelectedQuestions([]);
-      setExpandedSelectedQuestions({})
+      
+      if (!activePaperId) {
+        setPaperMeta(defaultPaperMeta);
+        setSelectedQuestions([])
+        setExpandedSelectedQuestions({})
+      }
+      
       //scroll to top of page to show success message
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -366,7 +414,7 @@ export default function PaperBuilder() {
             </p>
           </div>
           <div className="hero-actions">
-            <button onClick={createNewPaper} title="Create a new exam paper">New paper</button>
+            <button onClick={() => {createNewPaper(); navigate('/builder');}} title="Create a new exam paper">New paper</button>
             <button 
               className="secondary" 
               onClick={() => window.print()} 
@@ -573,11 +621,11 @@ export default function PaperBuilder() {
                   </button>
                   <button 
                     onClick={() => void savePaper()} 
-                    title="Save the exam paper"
+                    title={activePaperId ? "Update the exam paper" : "Save the exam paper"}
                     disabled={selectedQuestions.length === 0}
                     className="save-paper-btn"
                   >
-                    Save Paper
+                    {activePaperId ? 'Update Paper' : 'Save Paper'}
                   </button>
                 </div>
               </div>
