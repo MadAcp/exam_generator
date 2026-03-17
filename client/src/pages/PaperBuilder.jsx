@@ -37,6 +37,8 @@ export default function PaperBuilder() {
   const [expandedRows, setExpandedRows] = useState(null)
   const [expandedSelectedQuestions, setExpandedSelectedQuestions] = useState({})
   const paperRef = useRef(null)
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
 
   useEffect(() => {
     document.title = 'Build Paper - Exam Generator'
@@ -144,6 +146,7 @@ export default function PaperBuilder() {
     const { name, value } = event.target
 
     setFilters((current) => {
+      setFirst(0);
       if (name === 'subject') {
         return { ...current, subject: value, topic: '' }
       }
@@ -564,7 +567,12 @@ export default function PaperBuilder() {
                 key={selectedQuestions.length}
                 value={questions}
                 paginator
-                rows={10}
+                first={first}
+                rows={rows}
+                onPage={(e) => {
+                  setFirst(e.first);
+                  setRows(e.rows);
+                }}
                 rowsPerPageOptions={[5, 10, 25, 50]}
                 tableStyle={{ minWidth: '50rem' }}
                 stripedRows
@@ -581,6 +589,7 @@ export default function PaperBuilder() {
                 <Column field="difficulty" body={difficultyTemplate}></Column>
                 <Column field="marks"></Column>
                 <Column
+                  key={selectedQuestions.length}
                   header="Action"
                   body={(rowData) => {
                     const selected = selectedQuestions.some((item) => item.questionId === rowData.id)
