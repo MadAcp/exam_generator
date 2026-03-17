@@ -590,6 +590,51 @@ button.danger:disabled {
   transform: translateX(4px);
 }
 
+
+.preview-panel {
+  overflow: hidden;
+}
+
+.print-shell {
+  margin: 0 auto;
+  max-width: 794px;
+  background: #ffffff;
+  padding: 2rem;
+  border: 1px solid #dbe3f0;
+  border-radius: 18px;
+}
+
+.print-shell * {
+  /* page-break-inside: avoid; */
+}
+
+.paper-header {
+  border-bottom: 2px solid #cbd5e1;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.paper-questions,
+.answer-key ol {
+  display: grid;
+  gap: 1rem;
+  padding-left: 1.3rem;
+}
+
+.paper-options {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+}
+
+.answer-key {
+  margin-top: 2rem;
+  border-top: 1px dashed #94a3b8;
+  padding-top: 1rem;
+  page-break-before: always;
+}
+
+
+/* 
 .preview-panel {
   overflow: hidden;
 }
@@ -744,7 +789,7 @@ button.danger:disabled {
   font-weight: 600;
   color: #0c4a6e;
   font-size: 0.9rem;
-}
+} */
 
 /* Remove heavy borders and add clean padding */
 .custom-table .p-datatable-thead>tr>th {
@@ -1792,5 +1837,20 @@ button.danger:disabled {
   .search-input {
     width: 100%;
     margin-top: 0.5rem;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden; /* Hide everything in the body by default */
+  }
+  #printable-area, #printable-area * {
+    visibility: visible; /* Make the target div and its children visible */
+  }
+  #printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
   }
 }

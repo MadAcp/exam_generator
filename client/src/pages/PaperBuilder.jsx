@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import {useReactToPrint} from 'react-to-print'
 import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 import api from '../api'
@@ -321,6 +322,18 @@ export default function PaperBuilder() {
     setPaperMeta({ ...defaultPaperMeta })
   }
 
+   const handlePrint = useReactToPrint({
+    contentRef: paperRef,
+    documentTitle: "Exam_Paper",
+    pageStyle: `
+    @page { size: A4; margin: 20mm; }
+    .print-shell { font-family: 'Inter', sans-serif; color: black; }
+    .paper-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; }
+    .paper-question-line { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .answer-key { page-break-before: always; border-top: 1px dashed #ccc; padding-top: 20px; }
+    `
+  });
+
   async function downloadPdf() {
     if (!paperRef.current || selectedQuestions.length === 0) {
       setStatus({ type: 'error', message: 'Add questions to the paper before exporting a PDF.' })
@@ -418,7 +431,7 @@ export default function PaperBuilder() {
             <button onClick={() => {createNewPaper(); navigate('/builder');}} title="Create a new exam paper">New paper</button>
             <button 
               className="secondary" 
-              onClick={() => window.print()} 
+              onClick={handlePrint} 
               title="Print the current paper"
               disabled={selectedQuestions.length === 0}
             >
@@ -704,7 +717,70 @@ export default function PaperBuilder() {
 
 
 
-        <section className="panel preview-panel">
+<section className="panel preview-panel">
+          <div className="panel-header">
+            <h2>Print preview</h2>
+            <span>{activePaperId ? 'Saved paper' : 'Unsaved draft'}</span>
+          </div>
+
+          <div className="print-shell" id="printable-area" ref={paperRef}>
+            <div className="paper-header">
+              <h2>{paperMeta.title}</h2>
+              <div className="paper-meta">
+                <span>Subject: {paperMeta.subject}</span>
+                <span>Duration: {paperMeta.duration}</span>
+                <span>Total marks: {totalMarks}</span>
+                <span>Subjects Covered: {coveredSubjects.length > 0 ? coveredSubjects.join(', ') : 'None'}</span>
+              </div>
+              <p>{paperMeta.instructions}</p>
+            </div>
+
+            {/* /* Only to use for styled header */}
+            {/* <div className="paper-header">
+              <img src="/dnyandeep.png" alt="Logo" className="header-logo" />
+              <div className="header-text">
+                <h2>{paperMeta.title}</h2>
+                <div className="paper-meta">
+                  <span><strong>Subject:</strong> {paperMeta.subject}</span>
+                  <span><strong>Duration:</strong> {paperMeta.duration}</span>
+                  <span><strong>Total Marks:</strong> {totalMarks}</span>
+                  <span><strong>Date:</strong> {new Date().toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div> */}
+
+            <ol className="paper-questions">
+              {selectedQuestions.map((question) => (
+                <li key={question.questionId}>
+                  <div className="paper-question-line">
+                    <span>{question.text}</span>
+                    <strong>({question.marks} marks)</strong>
+                  </div>
+                  {question.options?.length ? (
+                    <ol className="paper-options" type="A">
+                      {question.options.map((option, index) => (
+                        <li key={`${question.questionId}-option-${getOptionLabel(index)}`}>{option}</li>
+                      ))}
+                    </ol>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+
+            <div className="answer-key">
+              <h3>Answer key</h3>
+              <ol>
+                {selectedQuestions.map((question) => (
+                  <li key={`${question.questionId}-answer`}>
+                    {question.answer || 'No answer key provided.'}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        {/* <section className="panel preview-panel">
           <div className="panel-header">
             <h2>Print preview</h2>
             <span>{activePaperId ? 'Saved paper' : 'Unsaved draft'}</span>
@@ -767,7 +843,7 @@ export default function PaperBuilder() {
               </ol>
             </div>
           </div>
-        </section>
+        </section> */}
       </div>
     </>
   )
