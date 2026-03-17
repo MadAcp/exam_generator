@@ -12,6 +12,9 @@ function sanitizePaper(body) {
         topic: String(question.topic || '').trim(),
         difficulty: String(question.difficulty || 'Medium').trim(),
         marks: Number(question.marks),
+        options: Array.isArray(question.options)
+          ? question.options.map((option) => String(option).trim()).filter(Boolean)
+          : [],
         answer: String(question.answer || '').trim(),
       }))
     : [];

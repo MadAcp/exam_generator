@@ -16,34 +16,33 @@ test('health endpoint reports memory storage mode by default', async () => {
   assert.equal(response.body.storage, 'memory');
 });
 
-test('question endpoints support create and update', async () => {
-  const createResponse = await request(app).post('/api/questions').send({
-    text: 'What is the value of 12 ÷ 3?',
-    subject: 'Mathematics',
-    topic: 'Arithmetic',
-    difficulty: 'Easy',
-    marks: 2,
-    answer: '4',
-    tags: ['division'],
-  });
+test('question endpoint serves read-only MCQs with subject and topic filtering', async () => {
+  const response = await request(app).get('/api/questions');
 
-  assert.equal(createResponse.status, 201);
-  assert.equal(createResponse.body.topic, 'Arithmetic');
+  assert.equal(response.status, 200);
+  assert.ok(response.body.length > 0);
+  assert.ok(response.body.every((question) => Array.isArray(question.options) && question.options.length > 0));
 
-  const updateResponse = await request(app)
-    .put(`/api/questions/${createResponse.body.id}`)
-    .send({
-      text: 'What is the value of 15 ÷ 3?',
-      subject: 'Mathematics',
-      topic: 'Arithmetic',
-      difficulty: 'Easy',
-      marks: 2,
-      answer: '5',
-      tags: ['division'],
-    });
+  const subjects = new Set(response.body.map((question) => question.subject));
+  assert.ok(subjects.has('HTML & CSS'));
+  assert.ok(subjects.has('JavaScript & DOM'));
+  assert.ok(subjects.has('React'));
+  assert.ok(subjects.has('MERN'));
 
-  assert.equal(updateResponse.status, 200);
-  assert.equal(updateResponse.body.answer, '5');
+  const reactResponse = await request(app).get('/api/questions').query({ subject: 'React' });
+  assert.equal(reactResponse.status, 200);
+  assert.ok(reactResponse.body.length > 0);
+  assert.ok(reactResponse.body.every((question) => question.subject === 'React'));
+
+  const hooksResponse = await request(app).get('/api/questions').query({ subject: 'React', topic: 'Hooks' });
+  assert.equal(hooksResponse.status, 200);
+  assert.ok(hooksResponse.body.length > 0);
+  assert.ok(hooksResponse.body.every((question) => question.subject === 'React'));
+  assert.ok(hooksResponse.body.every((question) => question.topic === 'Hooks'));
+
+  const createResponse = await request(app).post('/api/questions').send({ text: 'New question' });
+  assert.equal(createResponse.status, 405);
+  assert.match(createResponse.body.message, /read-only/i);
 });
 
 test('paper endpoints create a paper with calculated total marks', async () => {
@@ -54,6 +53,7 @@ test('paper endpoints create a paper with calculated total marks', async () => {
     topic: question.topic,
     difficulty: question.difficulty,
     marks: question.marks,
+    options: question.options,
     answer: question.answer,
   }));
 
@@ -68,4 +68,5 @@ test('paper endpoints create a paper with calculated total marks', async () => {
   assert.equal(paperResponse.status, 201);
   assert.equal(paperResponse.body.totalMarks, selected[0].marks + selected[1].marks);
   assert.equal(paperResponse.body.questions.length, 2);
+  assert.deepEqual(paperResponse.body.questions[0].options, selected[0].options);
 });

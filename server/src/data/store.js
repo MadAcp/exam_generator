@@ -1,18 +1,47 @@
 const { randomUUID } = require('crypto');
 const mongoose = require('mongoose');
-const Question = require('../models/Question');
 const ExamPaper = require('../models/ExamPaper');
-const { seedQuestions } = require('./sampleData');
+const { htmlCssMcqBank } = require('./htmlCssMcqBank');
+const { jsdomMcqBank } = require('./jsdomMcqBank');
+const { reactMcqBank } = require('./reactMcqBank');
+const { mernMcqBank } = require('./mernMcqBank');
+const { gitAgileRegexMcqBank } = require('./gitAgileRegexMcqBank');
+
+const mcqBanks = [
+  { questions: htmlCssMcqBank, subject: 'HTML & CSS' },
+  { questions: jsdomMcqBank, subject: 'JavaScript & DOM' },
+  { questions: reactMcqBank, subject: 'React' },
+  { questions: mernMcqBank, subject: 'MERN' },
+  { questions: gitAgileRegexMcqBank, subject: 'Git, Agile, Regex' },
+];
 
 let storageMode = 'memory';
+
+function prepareMcqQuestion(question, defaultSubject) {
+  return {
+    id: String(question.id),
+    text: String(question.text || '').trim(),
+    subject: String(defaultSubject || question.subject || 'General').trim(),
+    topic: String(question.topic || defaultSubject || 'General').trim(),
+    difficulty: String(question.difficulty || 'Medium').trim(),
+    marks: Number(question.marks) || 1,
+    options: Array.isArray(question.options)
+      ? question.options.map((option) => String(option).trim()).filter(Boolean)
+      : [],
+    answer: String(question.answer || '').trim(),
+    tags: Array.isArray(question.tags)
+      ? question.tags.map((tag) => String(tag).trim()).filter(Boolean)
+      : [],
+  };
+}
+
+const questionBank = mcqBanks.flatMap(({ questions, subject }) =>
+  questions.map((question) => prepareMcqQuestion(question, subject)),
+);
+
 const memoryStore = {
-  questions: seedQuestions.map((question) => ({ ...question })),
   papers: [],
 };
-
-function escapeRegex(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
 
 function normalizeQuestion(question) {
   return {
@@ -22,6 +51,7 @@ function normalizeQuestion(question) {
     topic: question.topic,
     difficulty: question.difficulty,
     marks: question.marks,
+    options: Array.isArray(question.options) ? question.options : [],
     answer: question.answer || '',
     tags: question.tags || [],
     createdAt: question.createdAt || null,
@@ -74,7 +104,7 @@ function matchesFilter(question, filters) {
 
 async function connectDatabase() {
   if (!process.env.MONGO_URI) {
-    console.log('MONGO_URI not found. Using in-memory sample data.');
+    console.log('MONGO_URI not found. Using read-only MCQ banks from server/src/data with in-memory papers.');
     storageMode = 'memory';
     return storageMode;
   }
@@ -96,77 +126,11 @@ function getStorageMode() {
 }
 
 function resetMemoryStore() {
-  memoryStore.questions = seedQuestions.map((question) => ({ ...question }));
   memoryStore.papers = [];
 }
 
 async function listQuestions(filters = {}) {
-  if (storageMode === 'mongo') {
-    const query = {};
-    if (filters.subject) {
-      query.subject = new RegExp(`^${escapeRegex(filters.subject.trim())}$`, 'i');
-    }
-    if (filters.topic) {
-      query.topic = new RegExp(`^${escapeRegex(filters.topic.trim())}$`, 'i');
-    }
-    if (filters.difficulty) {
-      query.difficulty = new RegExp(`^${escapeRegex(filters.difficulty.trim())}$`, 'i');
-    }
-    if (filters.search) {
-      const searchRegex = new RegExp(escapeRegex(filters.search.trim()), 'i');
-      query.$or = [{ text: searchRegex }, { subject: searchRegex }, { topic: searchRegex }, { tags: searchRegex }];
-    }
-
-    const questions = await Question.find(query).sort({ createdAt: -1 }).lean();
-    return questions.map(normalizeQuestion);
-  }
-
-  return memoryStore.questions.filter((question) => matchesFilter(question, filters)).map(normalizeQuestion);
-}
-
-async function createQuestion(payload) {
-  if (storageMode === 'mongo') {
-    const question = await Question.create(payload);
-    return normalizeQuestion(question.toObject());
-  }
-
-  const question = {
-    id: randomUUID(),
-    ...payload,
-    createdAt: new Date().toISOString(),
-  };
-  memoryStore.questions.unshift(question);
-  return normalizeQuestion(question);
-}
-
-async function updateQuestion(id, payload) {
-  if (storageMode === 'mongo') {
-    const question = await Question.findByIdAndUpdate(id, payload, { new: true, runValidators: true }).lean();
-    return question ? normalizeQuestion(question) : null;
-  }
-
-  const index = memoryStore.questions.findIndex((question) => question.id === id);
-  if (index === -1) {
-    return null;
-  }
-
-  memoryStore.questions[index] = { ...memoryStore.questions[index], ...payload };
-  return normalizeQuestion(memoryStore.questions[index]);
-}
-
-async function deleteQuestion(id) {
-  if (storageMode === 'mongo') {
-    const deleted = await Question.findByIdAndDelete(id).lean();
-    return Boolean(deleted);
-  }
-
-  const index = memoryStore.questions.findIndex((question) => question.id === id);
-  if (index === -1) {
-    return false;
-  }
-
-  memoryStore.questions.splice(index, 1);
-  return true;
+  return questionBank.filter((question) => matchesFilter(question, filters)).map(normalizeQuestion);
 }
 
 async function listPapers() {
@@ -221,13 +185,10 @@ async function updatePaper(id, payload) {
 module.exports = {
   connectDatabase,
   createPaper,
-  createQuestion,
-  deleteQuestion,
   getPaper,
   getStorageMode,
   listPapers,
   listQuestions,
   resetMemoryStore,
   updatePaper,
-  updateQuestion,
 };
