@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import {useReactToPrint} from 'react-to-print'
+import { useReactToPrint } from 'react-to-print'
 import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 import api from '../api'
@@ -25,7 +25,7 @@ export default function PaperBuilder() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const paperId = searchParams.get('id')
-  
+
   const [allQuestions, setAllQuestions] = useState([])
   const [questions, setQuestions] = useState([])
   const [papers, setPapers] = useState([])
@@ -257,7 +257,7 @@ export default function PaperBuilder() {
     }
 
     const examPapers = JSON.parse(localStorage.getItem('exam_papers')) || []
-    
+
     try {
       if (activePaperId) {
         // Update existing paper
@@ -280,20 +280,20 @@ export default function PaperBuilder() {
         examPapers.push(payload)
         setStatus({ type: 'success', message: 'Exam paper saved locally.' })
       }
-      
+
       localStorage.setItem('exam_papers', JSON.stringify(examPapers))
-      
+
       if (!activePaperId) {
         setPaperMeta(defaultPaperMeta);
         setSelectedQuestions([])
         setExpandedSelectedQuestions({})
       }
-      
+
       //scroll to top of page to show success message
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
       }, 0)
-      
+
     } catch (error) {
       setStatus({ type: 'error', message: 'Unable to save paper locally.' })
     }
@@ -322,7 +322,7 @@ export default function PaperBuilder() {
     setPaperMeta({ ...defaultPaperMeta })
   }
 
-   const handlePrint = useReactToPrint({
+  const handlePrint = useReactToPrint({
     contentRef: paperRef,
     documentTitle: "Exam_Paper",
     pageStyle: `
@@ -428,18 +428,18 @@ export default function PaperBuilder() {
             </p>
           </div>
           <div className="hero-actions">
-            <button onClick={() => {createNewPaper(); navigate('/builder');}} title="Create a new exam paper">New paper</button>
-            <button 
-              className="secondary" 
-              onClick={handlePrint} 
+            <button onClick={() => { createNewPaper(); navigate('/builder'); }} title="Create a new exam paper">New paper</button>
+            <button
+              className="secondary"
+              onClick={handlePrint}
               title="Print the current paper"
               disabled={selectedQuestions.length === 0}
             >
               Print paper
             </button>
-            <button 
-              className="secondary" 
-              onClick={() => void downloadPdf()} 
+            <button
+              className="secondary"
+              onClick={() => void downloadPdf()}
               title="Export paper as PDF file"
               disabled={selectedQuestions.length === 0}
             >
@@ -448,7 +448,7 @@ export default function PaperBuilder() {
           </div>
         </header>
 
- {status.message ? <div className={`status ${status.type}`}>{status.message}</div> : null}
+        {status.message ? <div className={`status ${status.type}`}>{status.message}</div> : null}
 
 
         <div className="workspace-grid">
@@ -491,21 +491,21 @@ export default function PaperBuilder() {
             <div className="stack compact">
               <div className="grid-2">
                 <label>
-                  Paper title <span style={{color: 'red'}}>*</span>
+                  Paper title <span style={{ color: 'red' }}>*</span>
                   <input name="title" value={paperMeta.title} onChange={handlePaperMetaChange} placeholder="Enter paper title" />
-                  {!paperMeta.title.trim() && <small style={{color: 'red'}}>Title is required</small>}
+                  {!paperMeta.title.trim() && <small style={{ color: 'red' }}>Title is required</small>}
                 </label>
                 <label>
-                  Subject <span style={{color: 'red'}}>*</span>
+                  Subject <span style={{ color: 'red' }}>*</span>
                   <input name="subject" value={paperMeta.subject} onChange={handlePaperMetaChange} placeholder="Enter subject" />
-                  {!paperMeta.subject.trim() && <small style={{color: 'red'}}>Subject is required</small>}
+                  {!paperMeta.subject.trim() && <small style={{ color: 'red' }}>Subject is required</small>}
                 </label>
               </div>
               <div className="grid-2">
                 <label>
-                  Duration <span style={{color: 'red'}}>*</span>
+                  Duration <span style={{ color: 'red' }}>*</span>
                   <input name="duration" value={paperMeta.duration} onChange={handlePaperMetaChange} placeholder="e.g., 60 minutes" />
-                  {!paperMeta.duration.trim() && <small style={{color: 'red'}}>Duration is required</small>}
+                  {!paperMeta.duration.trim() && <small style={{ color: 'red' }}>Duration is required</small>}
                 </label>
                 <label>
                   Total marks
@@ -513,9 +513,9 @@ export default function PaperBuilder() {
                 </label>
               </div>
               <label>
-                Instructions <span style={{color: 'red'}}>*</span>
+                Instructions <span style={{ color: 'red' }}>*</span>
                 <textarea name="instructions" rows="3" value={paperMeta.instructions} onChange={handlePaperMetaChange} placeholder="Enter instructions for the paper" />
-                {!paperMeta.instructions.trim() && <small style={{color: 'red'}}>Instructions are required</small>}
+                {!paperMeta.instructions.trim() && <small style={{ color: 'red' }}>Instructions are required</small>}
               </label>
 
             </div>
@@ -524,7 +524,7 @@ export default function PaperBuilder() {
 
 
 
-       
+
         <main className="workspace-grid">
           <section className="panel">
             <div className="panel-header">
@@ -620,24 +620,24 @@ export default function PaperBuilder() {
                   </div>
                 </div>
                 <div className="header-actions">
-                  <button 
-                    onClick={expandAllQuestions} 
+                  <button
+                    onClick={expandAllQuestions}
                     title="Expand all questions"
                     disabled={selectedQuestions.length === 0}
                     className="secondary"
                   >
                     Expand All
                   </button>
-                  <button 
-                    onClick={collapseAllQuestions} 
+                  <button
+                    onClick={collapseAllQuestions}
                     title="Collapse all questions"
                     disabled={selectedQuestions.length === 0}
                     className="secondary"
                   >
                     Collapse All
                   </button>
-                  <button 
-                    onClick={() => void savePaper()} 
+                  <button
+                    onClick={() => void savePaper()}
                     title={activePaperId ? "Update the exam paper" : "Save the exam paper"}
                     disabled={selectedQuestions.length === 0}
                     className="save-paper-btn"
@@ -656,60 +656,60 @@ export default function PaperBuilder() {
               )}
               <div className="builder-list">
                 {selectedQuestions.map((question, index) => {
-                const isExpanded = expandedSelectedQuestions[question.questionId]
-                return (
-                  <div className="builder-item" key={question.questionId}>
-                    <div className="builder-item-header" onClick={() => toggleSelectedQuestionExpansion(question.questionId)}>
-                      <div className="builder-item-title">
-                        <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
-                        <strong>Q{index + 1}.</strong>
-                        <span className="question-text">{question.text}</span>
-                        <span className="question-marks">({question.marks}m)</span>
-                      </div>
-                      <div className="builder-actions">
-                        <button className="secondary" onClick={(e) => { e.stopPropagation(); moveQuestion(index, -1); }} title="Move question up">
-                          ↑
-                        </button>
-                        <button className="secondary" onClick={(e) => { e.stopPropagation(); moveQuestion(index, 1); }} title="Move question down">
-                          ↓
-                        </button>
-                        <button className="danger" onClick={(e) => { e.stopPropagation(); removeQuestionFromPaper(question.questionId); }} title="Remove question from paper">
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                    {isExpanded && (
-                      <div className="builder-item-details">
-                        <div className="details-content">
-                          <div className="detail-row">
-                            <span className="label">Topic</span>
-                            <span className="value">{question.topic}</span>
-                          </div>
-                          <div className="detail-row">
-                            <span className="label">Difficulty</span>
-                            <span className="value difficulty-badge">{question.difficulty}</span>
-                          </div>
+                  const isExpanded = expandedSelectedQuestions[question.questionId]
+                  return (
+                    <div className="builder-item" key={question.questionId}>
+                      <div className="builder-item-header" onClick={() => toggleSelectedQuestionExpansion(question.questionId)}>
+                        <div className="builder-item-title">
+                          <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
+                          <strong>Q{index + 1}.</strong>
+                          <span className="question-text">{question.text}</span>
+                          <span className="question-marks">({question.marks}m)</span>
                         </div>
-                        {question.options?.length ? (
-                          <div className="options-detail">
-                            <div className="section-title">OPTIONS</div>
-                            <ol className="option-list" type="A">
-                              {question.options.map((option, optionIndex) => {
-                                const isCorrect = question.answer === option;
-                                return (
-                                  <li key={`${question.questionId}-opt-${optionIndex}`} className={isCorrect ? 'correct-answer' : ''}>
-                                    {option} {isCorrect && <span className="answer-indicator">✓</span>}
-                                  </li>
-                                );
-                              })}
-                            </ol>
-                          </div>
-                        ) : null}
+                        <div className="builder-actions">
+                          <button className="secondary" onClick={(e) => { e.stopPropagation(); moveQuestion(index, -1); }} title="Move question up">
+                            ↑
+                          </button>
+                          <button className="secondary" onClick={(e) => { e.stopPropagation(); moveQuestion(index, 1); }} title="Move question down">
+                            ↓
+                          </button>
+                          <button className="danger" onClick={(e) => { e.stopPropagation(); removeQuestionFromPaper(question.questionId); }} title="Remove question from paper">
+                            Remove
+                          </button>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                      {isExpanded && (
+                        <div className="builder-item-details">
+                          <div className="details-content">
+                            <div className="detail-row">
+                              <span className="label">Topic</span>
+                              <span className="value">{question.topic}</span>
+                            </div>
+                            <div className="detail-row">
+                              <span className="label">Difficulty</span>
+                              <span className="value difficulty-badge">{question.difficulty}</span>
+                            </div>
+                          </div>
+                          {question.options?.length ? (
+                            <div className="options-detail">
+                              <div className="section-title">OPTIONS</div>
+                              <ol className="option-list" type="A">
+                                {question.options.map((option, optionIndex) => {
+                                  const isCorrect = question.answer === option;
+                                  return (
+                                    <li key={`${question.questionId}-opt-${optionIndex}`} className={isCorrect ? 'correct-answer' : ''}>
+                                      {option} {isCorrect && <span className="answer-indicator">✓</span>}
+                                    </li>
+                                  );
+                                })}
+                              </ol>
+                            </div>
+                          ) : null}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -717,7 +717,7 @@ export default function PaperBuilder() {
 
 
 
-<section className="panel preview-panel">
+        <section className="panel preview-panel">
           <div className="panel-header">
             <h2>Print preview</h2>
             <span>{activePaperId ? 'Saved paper' : 'Unsaved draft'}</span>
