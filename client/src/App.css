@@ -1844,10 +1844,10 @@ button.danger:disabled {
   body * {
     visibility: hidden; /* Hide everything in the body by default */
   }
-  #printable-area, #printable-area * {
+  #printable-area, #printable-area, #paper-content * {
     visibility: visible; /* Make the target div and its children visible */
   }
-  #printable-area {
+  #printable-area, #paper-content {
     position: absolute;
     left: 0;
     top: 0;
